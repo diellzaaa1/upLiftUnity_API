@@ -11,18 +11,10 @@ namespace upLiftUnity_API.Models
         public string PhoneNumber { get; set; }
         [Required(AllowEmptyStrings = true)]
         public string Description { get; set; }
-
-        public string CV { get; set; }
+        
+        public string CV {  get; set; }
 
         [Required(AllowEmptyStrings = true)]
-        public string MotivationLetter { get; set; }
-
-        public string ApplicationStatus { get; set; }
-
-
-        public SupVol_Applications()
-        {
-            ApplicationStatus = "Pending";
-        }
+        public string MotivationLetter{  get; set; }
     }
 }

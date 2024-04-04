@@ -22,32 +22,6 @@ namespace upLiftUnity_API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("upLiftUnity_API.Models.Calls", b =>
-                {
-                    b.Property<int>("CallId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CallId"));
-
-                    b.Property<string>("CallerNickname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Risk_Level")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CallId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Calls");
-                });
-
             modelBuilder.Entity("upLiftUnity_API.Models.Donations", b =>
                 {
                     b.Property<int>("DonationID")
@@ -100,32 +74,6 @@ namespace upLiftUnity_API.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("upLiftUnity_API.Models.Rules", b =>
-                {
-                    b.Property<int>("RuleId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RuleId"));
-
-                    b.Property<string>("RuleDesc")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RuleName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RuleId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Rules");
-                });
-
             modelBuilder.Entity("upLiftUnity_API.Models.SupVol_Applications", b =>
                 {
                     b.Property<int>("ApplicationId")
@@ -133,10 +81,6 @@ namespace upLiftUnity_API.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ApplicationId"));
-
-                    b.Property<string>("ApplicationStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CV")
                         .IsRequired()
@@ -207,28 +151,6 @@ namespace upLiftUnity_API.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("upLiftUnity_API.Models.Calls", b =>
-                {
-                    b.HasOne("upLiftUnity_API.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("upLiftUnity_API.Models.Rules", b =>
-                {
-                    b.HasOne("upLiftUnity_API.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.User", b =>
