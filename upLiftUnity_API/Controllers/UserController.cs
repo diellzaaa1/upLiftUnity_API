@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using upLiftUnity_API.Models;
+using BCrypt.Net;
 
 namespace upLiftUnity_API.Controllers
 {

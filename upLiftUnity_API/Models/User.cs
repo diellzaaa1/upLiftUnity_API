@@ -19,11 +19,13 @@ namespace upLiftUnity_API.Models
         public string PhoneNumber {  get; set; }
       
         public string Address { get; set; }
-        
-        public int RoleId {  get; set; }
 
         [ForeignKey("RoleId")]
-        public Role UserRole { get;  }
+
+        public int RoleId {  get; set; }
+
+       
+        public Role? UserRole { get;}
 
 
 
