@@ -15,12 +15,26 @@ namespace upLiftUnity_API.Models
 
         public DbSet<Donations> Donations { get; set; } 
 
+        public DbSet<Calls> Calls { get; set; }
+
+        public DbSet<Rules> Rules { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
                 .HasOne(u => u.UserRole)
                 .WithMany()
                 .HasForeignKey(u => u.RoleId);
+
+            modelBuilder.Entity<Calls>()
+               .HasOne(c => c.User)
+               .WithMany()
+               .HasForeignKey(c =>c.UserId);
+
+            modelBuilder.Entity<Rules>()
+              .HasOne(c => c.User)
+              .WithMany()
+              .HasForeignKey(c => c.UserId);
         }
     }
 }
