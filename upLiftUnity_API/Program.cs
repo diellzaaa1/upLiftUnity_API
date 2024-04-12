@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using upLiftUnity_API.Models;
+using upLiftUnity_API.Repositories.ApplicationRepository;
 using upLiftUnity_API.Repositories.UserRepository;
 
 
@@ -19,6 +20,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<APIDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
 
 var app = builder.Build();
 
