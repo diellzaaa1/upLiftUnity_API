@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using upLiftUnity_API.Models;
 using upLiftUnity_API.Repositories.ApplicationRepository;
@@ -17,19 +18,23 @@ namespace upLiftUnity_API.Controllers
         }
         [HttpGet]
         [Route("GetApplications")]
-
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Get()
         {
             return Ok(await applicationRepository.GetSupVol_Applications());
         }
         [HttpGet]
         [Route("GetApplicationById/{id}")]
+        [Authorize(Roles = "SuperAdmin")]
+
         public async Task<IActionResult> GetAppById(int id)    {
             return Ok(await applicationRepository.GetSupVol_ApplicationsById(id));
         }
 
         [HttpGet]
         [Route("GetApplicationByType")]
+        [Authorize(Roles = "SuperAdmin")]
+
         public async Task<IActionResult> GetAppByType(String type)
         {
             return Ok(await applicationRepository.GetApplicationsByType(type));
@@ -37,6 +42,7 @@ namespace upLiftUnity_API.Controllers
 
         [HttpPost]
         [Route("AddApplication")]
+        [AllowAnonymous]
         public async Task<IActionResult> Post(SupVol_Applications app)
         {
             var result = await applicationRepository.InsertSupVol_Application(app);
@@ -48,6 +54,7 @@ namespace upLiftUnity_API.Controllers
         }
         [HttpPut]
         [Route("UpdateApplication")]
+
         public async Task<IActionResult> Put(SupVol_Applications app)
         {
             await applicationRepository.UpdateSupVol_Applications(app);

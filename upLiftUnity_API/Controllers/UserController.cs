@@ -106,7 +106,7 @@ namespace upLiftUnity_API.Controllers
 
         [HttpGet]
         [Route("GetUserByID/{Id}")]
-        [Authorize(Roles = "SuperAdmin,SuperVisor,Volunteer")]
+        [Authorize]
         public async Task<IActionResult> GetUserByID(int Id)
         {
             return Ok(await _user.GetUserById(Id));
