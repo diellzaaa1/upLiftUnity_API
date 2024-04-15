@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -7,13 +8,17 @@ namespace upLiftUnity_API.Services
 {
     public class TokenService
     {
-        public static string GenerateToken(int id)
+        public static string GenerateToken(int id, string role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("OUR_SECRET_KEY_FROM_EKIPA_SHKATERRUSE"); // Replace with your secret key
+            var key = Encoding.ASCII.GetBytes("OUR_SECRET_KEY_FROM_EKIPA_SHKATERRUSE"); 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, id.ToString()) }),
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, id.ToString()),
+                    new Claim(ClaimTypes.Role, role) 
+                }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -23,7 +28,12 @@ namespace upLiftUnity_API.Services
         }
 
         public static ClaimsPrincipal VerifyToken(string token)
+
         {
+            if (token == null)
+            {
+                throw new ArgumentNullException(nameof(token), "Token cannot be null.");
+            }
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("OUR_SECRET_KEY_FROM_EKIPA_SHKATERRUSE"); // Use the same secret key used to generate the token
             try

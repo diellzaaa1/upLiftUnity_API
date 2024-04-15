@@ -13,5 +13,7 @@ namespace upLiftUnity_API.Repositories.UserRepository
 
         Task<User> UpdateUser(User objUser);
         bool DeleteUser(int ID);
+
+        string GetUserRole(int roleId);
     }
 }

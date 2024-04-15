@@ -4,6 +4,7 @@ using upLiftUnity_API.Models;
 using BCrypt.Net;
 using upLiftUnity_API.Services;
 using upLiftUnity_API.Repositories.UserRepository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace upLiftUnity_API.Controllers
 {
@@ -33,13 +34,19 @@ namespace upLiftUnity_API.Controllers
                 return Unauthorized("Mejli ose fjalkalimi eshte gabim");
             }
 
-            var token = TokenService.GenerateToken(user.Id);
+            var roleName = _user.GetUserRole(user.RoleId);
 
-            // Shfaqni vetëm një mesazh në console për tokenin
-            Console.WriteLine("Tokeni i gjeneruar: " + token);
+            var token = TokenService.GenerateToken(user.Id, roleName);
 
-            return Ok();
+            // Kthe një objekt anonim si përgjigje
+            return Ok(new
+            {
+                IsAuthenticated = true,
+                Role = roleName,
+                Token = token
+            });
         }
+
 
         public class UserLogin {
             public string Email { get; set; }
@@ -47,6 +54,7 @@ namespace upLiftUnity_API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "SuperAdmin")]
         public IActionResult Create([FromBody] User user)
         {
 
@@ -72,6 +80,7 @@ namespace upLiftUnity_API.Controllers
         }
         [HttpGet]
         [Route("GetUsers")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Get()
         {
             var users = await _user.GetUsers();
@@ -79,6 +88,7 @@ namespace upLiftUnity_API.Controllers
         }
         [HttpPut]
         [Route("UpdateUser")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Put(User user)
         {
             await _user.UpdateUser(user);
@@ -87,6 +97,7 @@ namespace upLiftUnity_API.Controllers
         [HttpDelete]
         //[HttpDelete("{id}")]
         [Route("DeleteUser")]
+        [Authorize(Roles = "SuperAdmin")]
         public JsonResult Delete(int id)
         {
             _user.DeleteUser(id);
@@ -95,6 +106,7 @@ namespace upLiftUnity_API.Controllers
 
         [HttpGet]
         [Route("GetUserByID/{Id}")]
+        [Authorize(Roles = "SuperAdmin,SuperVisor,Volunteer")]
         public async Task<IActionResult> GetUserByID(int Id)
         {
             return Ok(await _user.GetUserById(Id));

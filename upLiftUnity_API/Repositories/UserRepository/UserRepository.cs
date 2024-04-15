@@ -48,7 +48,11 @@ namespace upLiftUnity_API.Repositories.UserRepository
         {
             return await _appDBContext.Users.Where(user => user.RoleId == roleId).ToListAsync();
         }
-
+        public string GetUserRole(int roleId)
+        {
+            var roleName = _appDBContext.Roles.SingleOrDefault(r => r.Id == roleId).RoleDesc;
+            return roleName;
+        }
 
     }
 }
