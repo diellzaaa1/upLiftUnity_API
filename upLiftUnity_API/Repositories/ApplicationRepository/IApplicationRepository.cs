@@ -1,4 +1,5 @@
-﻿using upLiftUnity_API.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using upLiftUnity_API.Models;
 
 namespace upLiftUnity_API.Repositories.ApplicationRepository
 {
@@ -12,7 +13,7 @@ namespace upLiftUnity_API.Repositories.ApplicationRepository
 
        Task <IEnumerable<SupVol_Applications>> GetApplicationsByType(String type);
 
-        Task<SupVol_Applications> UpdateSupVol_Applications(SupVol_Applications objApp);
+        Task<SupVol_Applications> UpdateSupVol_Applications(int id);
 
         bool DeleteApplication(int Id);
 

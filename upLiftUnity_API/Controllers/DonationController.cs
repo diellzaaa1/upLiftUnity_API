@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using upLiftUnity_API.Models;
 using upLiftUnity_API.Repositories.DonationRepository;
 using upLiftUnity_API.Services; 
-using System.Threading.Tasks; // Add this namespace for Task
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization; // Add this namespace for Task
 
 namespace upLiftUnity_API.Controllers
 {
@@ -22,6 +23,8 @@ namespace upLiftUnity_API.Controllers
 
         [HttpGet]
         [Route("GetDonations")]
+        [Authorize(Roles = "SuperAdmin")]
+
         public async Task<IActionResult> Get()
         {
             var donations = await _donation.GetDonations();
@@ -30,6 +33,7 @@ namespace upLiftUnity_API.Controllers
 
         [HttpPut]
         [Route("UpdateDonation")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> Put(Donations donation)
         {
             await _donation.UpdateDonation(donation);
@@ -38,6 +42,7 @@ namespace upLiftUnity_API.Controllers
 
         [HttpDelete]
         [Route("DeleteDonation")]
+        [Authorize(Roles = "SuperAdmin")]
         public JsonResult Delete(int id)
         {
             _donation.DeleteDonation(id);
@@ -46,6 +51,7 @@ namespace upLiftUnity_API.Controllers
 
         [HttpGet]
         [Route("GetDonationByID/{Id}")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> GetDonationByID(int Id)
         {
             return Ok(await _donation.GetDonationById(Id));

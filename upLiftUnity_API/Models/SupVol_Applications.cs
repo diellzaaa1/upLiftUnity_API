@@ -14,13 +14,13 @@ namespace upLiftUnity_API.Models
         public string PhoneNumber { get; set; }
        
         public string Description { get; set; }
-        
+
+        [DataType(DataType.Upload)]
+
         public string CV {  get; set; }
 
-        
-        public string MotivationLetter{  get; set; }
 
-        public string ApplicationStatus { get; set; }
+        public string ApplicationStatus { get; set; } = "e pa shqyrtuar";
 
         public string ApplicationType { get; set; }
 
