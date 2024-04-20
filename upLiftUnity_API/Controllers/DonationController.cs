@@ -50,5 +50,28 @@ namespace upLiftUnity_API.Controllers
         {
             return Ok(await _donation.GetDonationById(Id));
         }
+
+        [HttpPost]
+        [Route("SaveDonation")]
+
+        public IActionResult CreateDonation([FromBody] Donations donation)
+        {
+            if (!ModelState.IsValid) 
+            {
+                return BadRequest(ModelState);
+            }
+
+            if(_context.Donations.Any( d => d.DonationID == donation.DonationID ))
+            {
+                return Conflict("Ky donacion eshte realizuar nje here!");
+            }
+            _context.Donations.Add(donation);
+            _context.SaveChanges();
+
+            return Ok();
+        }
+    
+
+
     }
 }
