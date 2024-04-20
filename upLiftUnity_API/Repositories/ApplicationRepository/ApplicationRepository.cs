@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using upLiftUnity_API.Models;
 
 namespace upLiftUnity_API.Repositories.ApplicationRepository
@@ -22,12 +24,23 @@ namespace upLiftUnity_API.Repositories.ApplicationRepository
             return await _appDBContext.SupVol_Applications.FindAsync(id);
         }
 
-        public async Task<SupVol_Applications> UpdateSupVol_Applications(SupVol_Applications objApp)
+        public async Task<SupVol_Applications> UpdateSupVol_Applications(int id)
         {
-            _appDBContext.Entry(objApp).State = EntityState.Modified;
-            await _appDBContext.SaveChangesAsync();
-            return objApp;
+            var application = await _appDBContext.SupVol_Applications.FindAsync(id);
+
+            if (application == null)
+            {
+                return null; // Kthe null nëse aplikacioni nuk gjendet
+            }
+
+            application.ApplicationStatus = "E Shqyrtuar";
+            _appDBContext.Entry(application).State = EntityState.Modified;
+
+            await _appDBContext.SaveChangesAsync(); // Përditësoni bazën e të dhënave
+
+            return application; // Kthe aplikacionin e përditësuar
         }
+
 
         public bool DeleteApplication(int Id)
         {
