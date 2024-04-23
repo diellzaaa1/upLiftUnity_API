@@ -11,10 +11,10 @@ namespace upLiftUnity_API.Models
 
         public string Risk_Level { get; set; }
 
+        [ForeignKey("UserId")]
         public int UserId {  get; set; }
 
-        [ForeignKey("UserId")]
-        public User User{ get; set; }
+        public User User { get; }
 
 
     }
