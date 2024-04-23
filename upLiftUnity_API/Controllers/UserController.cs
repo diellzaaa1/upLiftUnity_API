@@ -54,7 +54,7 @@ namespace upLiftUnity_API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "SuperAdmin")]
+     
         public IActionResult Create([FromBody] User user)
         {
 

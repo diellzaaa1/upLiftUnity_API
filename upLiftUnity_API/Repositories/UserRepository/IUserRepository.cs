@@ -8,7 +8,6 @@ namespace upLiftUnity_API.Repositories.UserRepository
 
         Task <User> GetUserById(int id);
 
-        
         Task<IEnumerable<User>> GetUsersByRoleId(int roliId);
 
         Task<User> UpdateUser(User objUser);
