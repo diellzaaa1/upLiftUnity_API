@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Stripe;
 using System.Text;
+using upLiftUnity_API.Controllers;
 using upLiftUnity_API.Models;
 using upLiftUnity_API.Repositories.ApplicationRepository;
 using upLiftUnity_API.Repositories.DonationRepository;
@@ -18,7 +20,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 
 //Dependency Injection of DBcontext Class 
@@ -76,7 +78,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseCors(
-    options => options.WithOrigins("http://localhost:8082", "http://localhost:8081", "http://localhost:8080").AllowAnyMethod().AllowAnyHeader()
+    options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
 );
 
 app.UseAuthentication();
