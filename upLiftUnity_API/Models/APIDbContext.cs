@@ -20,6 +20,8 @@ namespace upLiftUnity_API.Models
 
         public DbSet<Rules> Rules { get; set; }
 
+        public DbSet<Schedule> Schedule { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
@@ -36,6 +38,11 @@ namespace upLiftUnity_API.Models
               .HasOne(c => c.User)
               .WithMany()
               .HasForeignKey(c => c.UserId);
+
+            modelBuilder.Entity<Schedule>()
+             .HasOne(c => c.UserSch)
+             .WithMany()
+             .HasForeignKey(c => c.UserId);
         }
     }
 }
