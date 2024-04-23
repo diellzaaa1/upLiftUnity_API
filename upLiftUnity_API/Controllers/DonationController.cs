@@ -5,6 +5,7 @@ using upLiftUnity_API.Repositories.DonationRepository;
 using upLiftUnity_API.Services;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using Stripe;
 using Stripe.Checkout;
 using System.IO;
@@ -23,11 +24,13 @@ namespace upLiftUnity_API.Controllers
         private readonly APIDbContext _context;
         private readonly IDonationRepository _donation;
         private readonly ILogger<DonationController> _logger;
-        public DonationController(APIDbContext _dbcontext, IDonationRepository _dbDonations, ILogger<DonationController> logger)
+        private readonly IConfiguration _config;
+        public DonationController(APIDbContext _dbcontext, IDonationRepository _dbDonations, ILogger<DonationController> logger, IConfiguration config)
         {
             _context = _dbcontext;
             _donation = _dbDonations;
             _logger = logger;
+            _config = config;
         }
 
         [HttpGet]
@@ -66,35 +69,19 @@ namespace upLiftUnity_API.Controllers
             return Ok(await _donation.GetDonationById(Id));
         }
 
-        //[HttpPost]
-        //[Route("SaveDonation")]
-
-        //public IActionResult CreateDonation([FromBody] Donations donation)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    if (_context.Donations.Any(d => d.DonationID == donation.DonationID))
-        //    {
-        //        return Conflict("Ky donacion eshte realizuar nje here!");
-        //    }
-        //    _context.Donations.Add(donation);
-        //    _context.SaveChanges();
-
-        //    return Ok();
-        //}
-
-
-
         [HttpPost]
         [Route("CreateCheckoutSession/{packageId}")]
         public async Task<IActionResult> CreateCheckoutSession(int packageId)
         {
             try
             {
-                StripeConfiguration.ApiKey = "sk_test_51NAuXrA98ZUN1q4APNCsEp07wxgzIxq8DwwO0PZSiScgHaLrQdErKlj0ZRE60EqjIo46fLmUdJgMtu8rhOOrrjNW00RqbhPzCQ";
+               
+                var stripeApiKey = _config["Stripe:SecretKey"];
+                StripeConfiguration.ApiKey = stripeApiKey;
+
+                string successUrl = _config["Urls:SuccessUrl"];
+                string cancelUrl = _config["Urls:CancelUrl"];
+
 
                 // Determine the package details based on the packageId received from the front end
                 string packageName;
@@ -138,10 +125,10 @@ namespace upLiftUnity_API.Controllers
                         }
                     },
                     Mode = "payment",
-                    SuccessUrl = "http://localhost:5051/api/donations/webhook?session_id={CHECKOUT_SESSION_ID}",
-                    CancelUrl = "http://localhost:5051/api/donations/failedWebook",
-                  
-                  
+                    SuccessUrl = successUrl,
+                    CancelUrl = cancelUrl,
+                    BillingAddressCollection = "required",
+
                 };
 
                 var service = new SessionService();
@@ -178,13 +165,14 @@ namespace upLiftUnity_API.Controllers
                 var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
 
                 var stripeSign = Request.Headers["Stripe-Signature"];
+                var webhookSecret = _config["Stripe:WebhookKey"];
 
                 var stripeEvent = EventUtility.ConstructEvent(
                 json,
-                Request.Headers["Stripe-Signature"],
-                "whsec_52eed3d8644e8766635d83251bc6f88c065b74c3aa42beeda97870cefb074d4f",
+                stripeSign,
+                webhookSecret,
                 throwOnApiVersionMismatch: false,
-                tolerance: 500
+                tolerance: 800
                 );
 
                 
@@ -201,6 +189,7 @@ namespace upLiftUnity_API.Controllers
 
                                 NameSurname = paymentIntent.CustomerDetails?.Name,
                                 Email = paymentIntent.CustomerDetails?.Email,
+                                Address = paymentIntent.CustomerDetails.Address.City,
                                 Amount = int.Parse(paymentIntent.AmountSubtotal.ToString()),
                                 TransactionId = paymentIntent.Id,
                                 Date = DateTime.Now
@@ -217,8 +206,9 @@ namespace upLiftUnity_API.Controllers
                             }
                             _context.Donations.Add(donation);
                             _context.SaveChanges();
-
+                 
                             return Ok("Donacioni është ruajtur me sukses!");
+                          
                         }
                         catch (Exception ex)
                         {
