@@ -28,7 +28,7 @@ namespace upLiftUnity_API.Models
 
         public int UserId { get; set; }
 
-        public User? UserSch { get; }
+        public User? UserSch { get; }   
 
 
 

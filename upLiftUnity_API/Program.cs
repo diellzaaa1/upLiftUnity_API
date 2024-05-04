@@ -8,7 +8,9 @@ using upLiftUnity_API.Controllers;
 using upLiftUnity_API.Models;
 using upLiftUnity_API.Repositories.ApplicationRepository;
 using upLiftUnity_API.Repositories.DonationRepository;
+using upLiftUnity_API.Repositories.ScheduleRepository;
 using upLiftUnity_API.Repositories.UserRepository;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +31,8 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection"))
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
 builder.Services.AddScoped<IDonationRepository, DonationRepository>();
+builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

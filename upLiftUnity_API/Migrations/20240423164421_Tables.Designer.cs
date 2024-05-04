@@ -12,8 +12,8 @@ using upLiftUnity_API.Models;
 namespace upLiftUnity_API.Migrations
 {
     [DbContext(typeof(APIDbContext))]
-    [Migration("20240422162757_ScheduleTablee")]
-    partial class ScheduleTablee
+    [Migration("20240423164421_Tables")]
+    partial class Tables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

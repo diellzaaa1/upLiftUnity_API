@@ -1,14 +1,9 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
-
-#nullable disable
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace upLiftUnity_API.Migrations
 {
-    /// <inheritdoc />
-    public partial class ScheduleTable : Migration
+    public partial class Tables : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -44,7 +39,10 @@ namespace upLiftUnity_API.Migrations
                 column: "UserId");
         }
 
-        /// <inheritdoc />
-       
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "Schedule");
+        }
     }
 }
