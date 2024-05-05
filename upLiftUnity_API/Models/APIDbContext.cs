@@ -17,12 +17,14 @@ namespace upLiftUnity_API.Models
         public DbSet<Rules> Rules { get; set; }
         public DbSet<Schedule> Schedule { get; set; }
 
+        public DbSet<UserActivity> UserActivities { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureUser(modelBuilder);
             ConfigureCalls(modelBuilder);
             ConfigureRules(modelBuilder);
             ConfigureSchedule(modelBuilder);
+            ConfigureUserActivities(modelBuilder);
         }
 
         private void ConfigureUser(ModelBuilder modelBuilder)
@@ -53,6 +55,13 @@ namespace upLiftUnity_API.Models
         {
             modelBuilder.Entity<Schedule>()
              .HasOne(c => c.UserSch)
+             .WithMany()
+             .HasForeignKey(c => c.UserId);
+        }
+        private void ConfigureUserActivities(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserActivity>()
+             .HasOne(c => c.User)
              .WithMany()
              .HasForeignKey(c => c.UserId);
         }

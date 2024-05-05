@@ -6,10 +6,12 @@ using Stripe;
 using System.Text;
 using upLiftUnity_API.Controllers;
 using upLiftUnity_API.Models;
+using upLiftUnity_API.Repositories.ActivitiesRepository;
 using upLiftUnity_API.Repositories.ApplicationRepository;
 using upLiftUnity_API.Repositories.DonationRepository;
 using upLiftUnity_API.Repositories.ScheduleRepository;
 using upLiftUnity_API.Repositories.UserRepository;
+
 
 
 
@@ -32,6 +34,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
 builder.Services.AddScoped<IDonationRepository, DonationRepository>();
 builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+builder.Services.AddScoped<IActivitiesRepository, ActivitiesRepository>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

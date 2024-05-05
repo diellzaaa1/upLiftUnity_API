@@ -10,7 +10,7 @@ namespace upLiftUnity_API.Models
         public string IPAddress { get; set; }
         public DateTime LoginTime { get; set; }
 
-        [ForeignKey("UserId")]
+        [ForeignKey("Id")]
         public int UserId { get; set; }
         public User? User { get; }
     }

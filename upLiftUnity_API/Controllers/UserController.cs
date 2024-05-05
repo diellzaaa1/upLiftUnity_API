@@ -33,6 +33,8 @@ namespace upLiftUnity_API.Controllers
             {
                 return Unauthorized("Mejli ose fjalkalimi eshte gabim");
             }
+            var ipAddress = HttpContext.Connection.RemoteIpAddress.ToString();
+            LogUserActivity(user.Id, ipAddress);
 
             var roleName = _user.GetUserRole(user.RoleId);
 
@@ -45,6 +47,18 @@ namespace upLiftUnity_API.Controllers
                 Role = roleName,
                 Token = token
             });
+        }
+        private void LogUserActivity(int userId, string ipAddress)
+        {
+            var userActivity = new UserActivity
+            {
+                UserId = userId,
+                IPAddress = ipAddress,
+                LoginTime = DateTime.Now
+            };
+
+            _context.UserActivities.Add(userActivity);
+            _context.SaveChanges();
         }
 
 
