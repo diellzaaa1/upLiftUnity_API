@@ -69,6 +69,17 @@ namespace upLiftUnity_API.Controllers
             return Ok(await _donation.GetDonationById(Id));
         }
 
+        [HttpGet]
+        [Route("GetMonthlyDonationCounts")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<IActionResult> GetMonthlyDonationCounts()
+        {
+            var monthlyDonationCounts = await _donation.GetDonationsPerMonth();
+            return Ok(monthlyDonationCounts);
+        }
+
+
+
         [HttpPost]
         [Route("CreateCheckoutSession/{packageId}")]
         public async Task<IActionResult> CreateCheckoutSession(int packageId)
