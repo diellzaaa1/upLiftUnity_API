@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using upLiftUnity_API.MongoModels;
 
@@ -26,6 +27,22 @@ namespace upLiftUnity_API.MongoControllers
             return Ok(call);
         }
 
+        [HttpPut]
+        public async Task<IActionResult> Update(Call call)
+        {
+            var filter = Builders<Call>.Filter.Eq(x => x.Id, call.Id);
+
+            await _calls.ReplaceOneAsync(filter, call);
+            return Ok(call);
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult>Delete(ObjectId id)
+        {
+            var filter = Builders<Call>.Filter.Eq(x => x.Id, id);
+            await _calls.DeleteOneAsync(filter);
+            return Ok();
+        }
        
     }
 }
