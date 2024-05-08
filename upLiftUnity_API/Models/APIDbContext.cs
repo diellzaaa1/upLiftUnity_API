@@ -13,7 +13,7 @@ namespace upLiftUnity_API.Models
         public DbSet<Role> Roles { get; set; }
         public DbSet<SupVol_Applications> SupVol_Applications { get; set; }
         public DbSet<Donations> Donations { get; set; }
-        public DbSet<Calls> Calls { get; set; }
+       
         public DbSet<Rules> Rules { get; set; }
         public DbSet<Schedule> Schedule { get; set; }
 
@@ -21,7 +21,6 @@ namespace upLiftUnity_API.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureUser(modelBuilder);
-            ConfigureCalls(modelBuilder);
             ConfigureRules(modelBuilder);
             ConfigureSchedule(modelBuilder);
             ConfigureUserActivities(modelBuilder);
@@ -35,13 +34,7 @@ namespace upLiftUnity_API.Models
                 .HasForeignKey(u => u.RoleId);
         }
 
-        private void ConfigureCalls(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Calls>()
-               .HasOne(c => c.User)
-               .WithMany()
-               .HasForeignKey(c => c.UserId);
-        }
+        
 
         private void ConfigureRules(ModelBuilder modelBuilder)
         {
