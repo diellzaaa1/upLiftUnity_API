@@ -24,21 +24,22 @@ namespace upLiftUnity_API.Repositories.ApplicationRepository
             return await _appDBContext.SupVol_Applications.FindAsync(id);
         }
 
-        public async Task<SupVol_Applications> UpdateSupVol_Applications(int id)
+
+        public async Task<SupVol_Applications> UpdateSupVol_Applications(int id, string status)
         {
             var application = await _appDBContext.SupVol_Applications.FindAsync(id);
 
             if (application == null)
             {
-                return null; 
+                return null;
             }
 
-            application.ApplicationStatus = "E Shqyrtuar";
+            application.ApplicationStatus = status;
             _appDBContext.Entry(application).State = EntityState.Modified;
 
-            await _appDBContext.SaveChangesAsync(); // Përditësoni bazën e të dhënave
+            await _appDBContext.SaveChangesAsync();
 
-            return application; // Kthe aplikacionin e përditësuar
+            return application;
         }
 
 
@@ -73,5 +74,7 @@ namespace upLiftUnity_API.Repositories.ApplicationRepository
         {
             return await _appDBContext.SupVol_Applications.Where(application => application.ApplicationType == type).ToListAsync();
         }
+
+       
     }
 }

@@ -13,7 +13,7 @@ namespace upLiftUnity_API.Repositories.ApplicationRepository
 
        Task <IEnumerable<SupVol_Applications>> GetApplicationsByType(String type);
 
-        Task<SupVol_Applications> UpdateSupVol_Applications(int id);
+        Task<SupVol_Applications> UpdateSupVol_Applications(int id, string status);
 
         bool DeleteApplication(int Id);
 
