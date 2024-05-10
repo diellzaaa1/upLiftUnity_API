@@ -21,6 +21,13 @@ public class ScheduleRepository : IScheduleRepository
     {
         return await _appDBContext.Schedule.FindAsync(id);
     }
+    public async Task<Schedule> GetScheduleByUserId(int userId)
+    {
+        return await _appDBContext.Schedule
+               .Include(schedule => schedule.UserSch) 
+               .FirstOrDefaultAsync(schedule => schedule.UserId == userId);
+    }
+
 
     public async Task<Schedule> UpdateSchedule(Schedule sch)
     {
@@ -54,6 +61,24 @@ public class ScheduleRepository : IScheduleRepository
         await _appDBContext.SaveChangesAsync();
         return objSch;
     }
+    public async Task<Schedule> GetScheduleByUserIdAndMonth(int userId, int month, int year)
+    {
+        try
+        {
+            var schedule = await _appDBContext.Schedule
+                .FirstOrDefaultAsync(s => s.UserId == userId &&
+                                          (s.FirstDate.Month == month && s.FirstDate.Year == year ||
+                                           s.SecondDate.Month == month && s.SecondDate.Year == year ||
+                                           s.ThirdDate.Month == month && s.ThirdDate.Year == year ||
+                                           s.FourthDate.Month == month && s.FourthDate.Year == year));
 
+            return schedule;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error occurred while getting schedule: {ex.Message}");
+            return null; 
+        }
+    }
 
 }

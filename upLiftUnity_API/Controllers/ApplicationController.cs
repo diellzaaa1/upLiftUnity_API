@@ -61,7 +61,7 @@ namespace upLiftUnity_API.Controllers
 
             if (updatedApplication == null)
             {
-                return NotFound(); // Kthe një përgjigje NotFound nëse aplikacioni nuk gjendet
+                return NotFound(); 
             }
 
             return Ok("Updated Successfully"); // Kthe një përgjigje Ok nëse përditësimi është kryer me sukses

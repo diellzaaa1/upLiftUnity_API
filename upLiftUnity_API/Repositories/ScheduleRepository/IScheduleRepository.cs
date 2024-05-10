@@ -10,10 +10,14 @@ namespace upLiftUnity_API.Repositories.ScheduleRepository
 
         Task<Schedule> GetScheduleById(int id);
 
+        Task<Schedule> GetScheduleByUserId(int useriId);
+
 
         Task<Schedule> UpdateSchedule(Schedule schedule);
 
         bool DeleteSchedule(int Id);
 
+        public  Task<Schedule> GetScheduleByUserIdAndMonth(int userId, int month, int year);
+        
     }
 }

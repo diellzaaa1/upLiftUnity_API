@@ -30,7 +30,7 @@ namespace upLiftUnity_API.Repositories.ApplicationRepository
 
             if (application == null)
             {
-                return null; // Kthe null nëse aplikacioni nuk gjendet
+                return null; 
             }
 
             application.ApplicationStatus = "E Shqyrtuar";

@@ -31,20 +31,42 @@ namespace upLiftUnity_API.Controllers
         {
             return Ok(await scheduleRepository.GetScheduleById(id));
         }
+        [HttpGet]
+        [Route("GetScheduleByUserId")]
+        public async Task<IActionResult> GetScheduleByUserId(int userId)
+        {
+            return Ok(await scheduleRepository.GetScheduleByUserId(userId));
+        }
 
-      
+
 
         [HttpPost]
         [Route("AddSchedule")]
-    
-        public async Task<IActionResult> Post(Schedule sch)
+
+        public async Task<IActionResult> AddSchedule(Schedule sch)
         {
-            var result = await scheduleRepository.InsertSchedule(sch);
-            if (result.Id == 0)
+           
+            var currentMonth = DateTime.Now.Month;
+            var currentYear = DateTime.Now.Year;
+
+          
+            var existingSchedule = await scheduleRepository.GetScheduleByUserIdAndMonth(sch.UserId, currentMonth, currentYear);
+
+            if (existingSchedule != null)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Something Went Wrong");
+                return StatusCode(StatusCodes.Status400BadRequest, "User already has a schedule for the current month. Cannot add a new schedule.");
             }
-            return Ok("Added Successfully");
+            else
+            {
+                var result = await scheduleRepository.InsertSchedule(sch);
+
+                if (result.Id == 0)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Something Went Wrong");
+                }
+
+                return Ok("Schedule Added Successfully");
+            }
         }
         [HttpPut]
         [Route("UpdateSchedule")]
