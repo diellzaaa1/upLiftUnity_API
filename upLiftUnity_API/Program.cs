@@ -11,9 +11,10 @@ using upLiftUnity_API.Repositories.ApplicationRepository;
 using upLiftUnity_API.Repositories.DonationRepository;
 using upLiftUnity_API.Repositories.ScheduleRepository;
 using upLiftUnity_API.Repositories.UserRepository;
-using MongoDB.Driver;
-using MongoDB.Driver.Core.Configuration;
+
 using upLiftUnity_API.MongoModels;
+using upLiftUnity_API.Services.EmailSender;
+
 
 
 
@@ -29,6 +30,7 @@ builder.Services.AddSwaggerGen();
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 
+
 //Dependency Injection of DBcontext Class 
 builder.Services.AddDbContext<APIDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
@@ -38,6 +40,9 @@ builder.Services.AddScoped<IDonationRepository, DonationRepository>();
 builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddScoped<IActivitiesRepository, ActivitiesRepository>();
 builder.Services.AddSingleton<MongoDbContext>();
+builder.Services.AddScoped<IEmailSender,EmailSender>();
+
+
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -85,6 +90,8 @@ builder.Services.AddSwaggerGen(options =>
 
 
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

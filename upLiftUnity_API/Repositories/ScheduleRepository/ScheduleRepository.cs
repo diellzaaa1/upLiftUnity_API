@@ -14,7 +14,8 @@ public class ScheduleRepository : IScheduleRepository
 
     public async Task<IEnumerable<Schedule>> GetSchedules()
     {
-        return await _appDBContext.Schedule.ToListAsync();
+        return await _appDBContext.Schedule
+            .Include(schedule => schedule.UserSch).ToListAsync();
     }
 
     public async Task<Schedule> GetScheduleById(int id)

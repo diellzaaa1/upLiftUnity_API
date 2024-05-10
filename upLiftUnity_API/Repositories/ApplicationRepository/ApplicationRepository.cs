@@ -2,16 +2,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using upLiftUnity_API.Models;
+using upLiftUnity_API.Services.EmailSender;
+
 
 namespace upLiftUnity_API.Repositories.ApplicationRepository
 {
     public class ApplicationRepository : IApplicationRepository
     {
         private readonly APIDbContext _appDBContext;
+        private readonly IEmailSender _emailSender;
 
-        public ApplicationRepository(APIDbContext context)
+        public ApplicationRepository(APIDbContext context,IEmailSender emailSender)
         {
             _appDBContext = context ?? throw new ArgumentNullException(nameof(context));
+            _emailSender = emailSender ?? throw new ArgumentNullException();
         }
 
         public async Task<IEnumerable<SupVol_Applications>> GetSupVol_Applications()
@@ -38,6 +42,24 @@ namespace upLiftUnity_API.Repositories.ApplicationRepository
             _appDBContext.Entry(application).State = EntityState.Modified;
 
             await _appDBContext.SaveChangesAsync();
+
+            // Përcaktoni mesazhin e email-it bazuar në statusin e aplikimit
+            string message = "";
+            if (status == "pranohet")
+            {
+                message = "Përshëndetje " + application.NameSurname + ",\n\nAplikimi juaj për pozitën në linjën upLiftUnity është pranuar. Ju falënderojmë për interesimin dhe angazhimin tuaj. Ju lutemi të na kontaktoni për hollësi të mëtejshme rreth procedurës së aplikimit.\n\nMe respekt,\nEkipi i upLiftUnity";
+            }
+            else if (status == "refuzohet")
+            {
+                message = "Përshëndetje " + application.NameSurname + ",\n\nNa vjen keq, por aplikimi juaj për pozitën në linjën upLiftUnity është refuzuar. Ju falënderojmë për interesimin dhe përpjekjet tuaja. Ju inkurajojmë të vazhdoni të kërkoni mundësi të tjera dhe të mos heqni dorë nga synimet tuaja.\n\nMe respekt,\nEkipi i upLiftUnity";
+            }
+            else
+            {
+                message = "Përshëndetje " + application.NameSurname + ",\n\nJu njoftojmë që aplikimi juaj për pozitën në linjën upLiftUnity është në proces. Ju do të kontaktoheni në mënyrë të mëtejshme për hollësi rreth statusit të aplikimit.\n\nMe respekt,\nEkipi i upLiftUnity";
+            }
+
+            // Dërgoni email-in
+            await _emailSender.SendEmailAsync(application.Email, "Njoftim rreth aplikimit në linjën upLiftUnity", message);
 
             return application;
         }
