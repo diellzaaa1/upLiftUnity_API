@@ -98,37 +98,31 @@ namespace upLiftUnity_API.MongoControllers
 
 
 
-        [HttpDelete("{id}")]
+        [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> DeleteNote(string id)
         {
             try
             {
                 var noteId = Guid.Parse(id);
 
-                var note = await _notes.Find(x => x.NoteId == noteId).FirstOrDefaultAsync();
-
-                if (note == null)
-                {
-                    return NotFound();
-                }
-
-           
                 var result = await _notes.DeleteOneAsync(x => x.NoteId == noteId);
 
-                if (result.DeletedCount == 0)
+                if (result.IsAcknowledged)
                 {
-                    return StatusCode(500, "Failed to delete note"); 
+                    return Ok();
                 }
-
-                return Ok("Note deleted successfully.");
+                else
+                {
+                    return StatusCode(500, "Delete failed");
+                }
             }
             catch (FormatException)
             {
-                return BadRequest("Invalid ID format"); 
+                return BadRequest("Invalid ID format");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}"); 
+                return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
 
