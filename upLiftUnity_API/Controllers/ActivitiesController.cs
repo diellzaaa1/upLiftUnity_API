@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using upLiftUnity_API.Repositories.ActivitiesRepository;
-using upLiftUnity_API.Repositories.ScheduleRepository;
 
 namespace upLiftUnity_API.Controllers
 {

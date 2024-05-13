@@ -5,6 +5,7 @@ using BCrypt.Net;
 using upLiftUnity_API.Services;
 using upLiftUnity_API.Repositories.UserRepository;
 using Microsoft.AspNetCore.Authorization;
+using upLiftUnity_API.Services.EmailSender;
 
 namespace upLiftUnity_API.Controllers
 {
@@ -16,13 +17,16 @@ namespace upLiftUnity_API.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly APIDbContext _context;
         private readonly IUserRepository _user;
+        private readonly IEmailSender _emailSender;
 
 
-        public UserController(ILogger<UserController> logger, APIDbContext _dbcontext, IUserRepository _dbuser)
+        public UserController(ILogger<UserController> logger, APIDbContext _dbcontext, IUserRepository _dbuser, IEmailSender emailSender)
         {
             _logger = logger;
             _context = _dbcontext;
             _user = _dbuser;
+            _emailSender = emailSender;
+
         }
         [HttpPost("/login")]
         public IActionResult Login([FromBody] UserLogin Request)
@@ -68,7 +72,7 @@ namespace upLiftUnity_API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "SuperAdmin")]
+      
         public IActionResult Create([FromBody] User user)
         {
 
@@ -81,6 +85,17 @@ namespace upLiftUnity_API.Controllers
             {
                 return Conflict("Ky mejl është tashmë i regjistruar.");
             }
+            string subject = "Informacione rreth kyçjes në Sistem";
+            string message = $"Përshëndetje {user.Name + user.Surname},\n\n" +
+                             $"Ju lutem gjeni kredencialet tuaja për hyrje në sistem, bashkë me linkun për regjistrim:\n\n" +
+                             $"- Emaili: {user.Email}\n" +
+                             $"- Fjalëkalimi: {user.Password}\n\n" +
+                             $"Ju lutemi klikoni në linkun e mëposhtëm për të filluar procesin e regjistrimit:\n" +
+                             $"http://localhost:8080/#/login\n\n" +
+                             $"Nëse keni ndonjë pyetje ose problem gjatë procesit të kyçjes, mos hezitoni të na kontaktoni.\n\n" +
+                             $"Me respekt,\n" +
+                             $"upLiftUnity";
+
 
             var hashedPass = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
@@ -89,7 +104,11 @@ namespace upLiftUnity_API.Controllers
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            // Kthejë një përgjigje të suksesshme
+
+
+            _emailSender.SendEmailAsync(user.Email, subject, message);
+
+
             return Ok();
         }
         [HttpGet]
@@ -108,6 +127,7 @@ namespace upLiftUnity_API.Controllers
             await _user.UpdateUser(user);
             return Ok("Updated Successfully");
         }
+
         [HttpDelete]
         //[HttpDelete("{id}")]
         [Route("DeleteUser")]
@@ -125,6 +145,22 @@ namespace upLiftUnity_API.Controllers
         {
             return Ok(await _user.GetUserById(Id));
         }
+
+        [HttpPost]
+        [Route("changePassword")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            return Ok(await _user.ChangePassword(request.UserId, request.OldPassword, request.NewPassword));
+        }
+
+        public class ChangePasswordRequest
+        {
+            public int UserId { get; set; }
+            public string OldPassword { get; set; }
+            public string NewPassword { get; set; }
+        }
+
 
         [HttpGet]
         [Route("GetUsersByRoleId")]
