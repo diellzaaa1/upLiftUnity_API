@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Linq.Expressions;
 using upLiftUnity_API.MongoModels;
 
 namespace upLiftUnity_API.MongoControllers
@@ -10,7 +11,8 @@ namespace upLiftUnity_API.MongoControllers
     public class CallsController : Controller
     {
         private readonly IMongoCollection<Call> _calls;
-        public CallsController(MongoDbContext mongoDbContext) {
+        public CallsController(MongoDbContext mongoDbContext)
+        {
             _calls = mongoDbContext.Database?.GetCollection<Call>("call");
         }
 
@@ -36,59 +38,99 @@ namespace upLiftUnity_API.MongoControllers
 
 
         [HttpPost]
-        public async Task<ObjectId> Create(Call call)
+        public async Task<IActionResult> Create([FromBody] Call call)
         {
+            call.CallId = Guid.NewGuid();
             await _calls.InsertOneAsync(call);
-            return (ObjectId)call.Id;
+            return Ok(call);
         }
 
 
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, Call call)
+        [HttpPut("Update/{id}")]
+        public async Task<IActionResult> Update(string id, [FromBody] Call call)
         {
-            if (!ObjectId.TryParse(id, out ObjectId objectId))
+            try
             {
-                return BadRequest("Invalid ObjectId format.");
+                using var cursor = await _calls.FindAsync(x => x.CallId == Guid.Parse(id));
+                var firstCall = await cursor.FirstAsync();
+
+                call.Id = firstCall.Id;
+
+                var result = await _calls.ReplaceOneAsync(x => x.CallId == Guid.Parse(id), call);
+
+                if (result.IsAcknowledged && result.ModifiedCount > 0)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return StatusCode(500, "Update failed");
+                }
+
             }
-
-            // Set the Id property of the call object to the parsed ObjectId
-            call.Id = objectId;
-
-            var filter = Builders<Call>.Filter.Eq(x => x.Id, objectId);
-
-            var update = Builders<Call>.Update
-                .Set(x => x.CallerNickname, call.CallerNickname)
-                .Set(x => x.Description, call.Description)
-                .Set(x => x.RiskLevel, call.RiskLevel);
-
-            var result = await _calls.UpdateOneAsync(filter, update);
-
-            if (result.ModifiedCount > 0)
+            catch (Exception ex)
             {
-                return Ok(call);
-            }
-            else
-            {
-                return NotFound();
+                return StatusCode(500, $"an error ocurred: {ex.Message}");
             }
         }
 
 
+
+
+
+
+        //[HttpDelete("{id}")]
+        //public async Task<ActionResult> Delete(string id)
+        //{
+        //    if (!ObjectId.TryParse(id, out ObjectId objectId))
+        //    {
+        //        return BadRequest("Invalid ObjectId format.");
+        //    }
+
+        //    var filter = Builders<Call>.Filter.Eq(x => x.Id, objectId);
+        //    await _calls.DeleteOneAsync(filter);
+        //    return Ok();
+        //}
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(string id)
+        public async Task<IActionResult> DeleteCall(string id)
         {
-            if (!ObjectId.TryParse(id, out ObjectId objectId))
+            try
             {
-                return BadRequest("Invalid ObjectId format.");
+                var callId = Guid.Parse(id);
+
+                var note = await _calls.Find(x => x.CallId == callId).FirstOrDefaultAsync();
+
+                if (note == null)
+                {
+                    return NotFound();
+                }
+
+
+                var result = await _calls.DeleteOneAsync(x => x.CallId == callId);
+
+                if (result.DeletedCount == 0)
+                {
+                    return StatusCode(500, "Failed to delete note");
+                }
+
+                return Ok("Note deleted successfully.");
             }
-
-            var filter = Builders<Call>.Filter.Eq(x => x.Id, objectId);
-            await _calls.DeleteOneAsync(filter);
-            return Ok();
+            catch (FormatException)
+            {
+                return BadRequest("Invalid ID format");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
-
 
     }
 }
+    
+
+
+
+
