@@ -1,15 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using upLiftUnity_API.Models;
+using upLiftUnity_API.Services.EmailSender;
 
 namespace upLiftUnity_API.Repositories.UserRepository
 {
     public class UserRepository : IUserRepository
     {
         private readonly APIDbContext _appDBContext;
+
+       
         public UserRepository(APIDbContext context)
         {
             _appDBContext = context ??
                 throw new ArgumentNullException(nameof(context));
+          
+          
         }
         public async Task<IEnumerable<User>> GetUsers()
         {
@@ -53,6 +59,24 @@ namespace upLiftUnity_API.Repositories.UserRepository
             var roleName = _appDBContext.Roles.SingleOrDefault(r => r.Id == roleId).RoleDesc;
             return roleName;
         }
+
+        public async Task<bool> ChangePassword(int userId, string oldPassword, string newPassword)
+        {
+            var user = _appDBContext.Users.FirstOrDefault(u => u.Id == userId);
+   
+            if (user == null || !BCrypt.Net.BCrypt.Verify(oldPassword, user.Password))
+            {
+                Console.WriteLine("Old password does not match.");
+                return false;
+            }
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            await _appDBContext.SaveChangesAsync();
+
+            return true;
+        }
+
 
     }
 }
