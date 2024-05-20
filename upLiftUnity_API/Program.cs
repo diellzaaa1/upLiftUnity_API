@@ -45,7 +45,7 @@ builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<IEmailSender,EmailSender>();
 builder.Services.AddScoped<NotificationHub>();
 builder.Services.AddSignalR();
-builder.Services.AddScoped<NotificationHub>();
+//builder.Services.AddScoped<NotificationHub>();
 builder.Services.AddScoped<NotificationService>();
 
 
@@ -92,7 +92,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
        builder
-           .WithOrigins("http://localhost:8080", "http://localhost:8081", "http://localhost:8082","http://localhost:8080/#/notifications/notificationHub") // Allow requests from this origin
+           .WithOrigins("http://localhost:8080", "http://localhost:8081", "http://localhost:8082") // Allow requests from this origin
            .AllowAnyMethod()
            .AllowAnyHeader()
            .AllowCredentials()); 

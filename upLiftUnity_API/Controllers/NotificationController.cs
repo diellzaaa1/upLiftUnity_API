@@ -51,7 +51,7 @@ namespace upLiftUnity_API.Controllers
         }
 
         [HttpGet("Notifications")]
-        public List<NotificationDto> GetUserNotifications(int userId)
+        public List<NotificationDto> GetUserNotifications([FromQuery] int userId)
         {
             return GetUserDummyNotifications().FindAll(i => i.UserId == userId);
         }

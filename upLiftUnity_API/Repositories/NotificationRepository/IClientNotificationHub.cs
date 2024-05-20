@@ -8,5 +8,7 @@ namespace upLiftUnity_API.Repositories.NotificationRepository
     {
         Task ClientReceiveMessage(string user, string message);
         Task SendNotificationToClient(NotificationDto notification);
+
+        Task SendWelcomeMessageToNewClients(string message);
     }
 }

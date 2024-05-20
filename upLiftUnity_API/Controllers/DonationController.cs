@@ -222,9 +222,10 @@ namespace upLiftUnity_API.Controllers
                                 return Conflict("Ky donacion eshte realizuar nje here!");
                             }
                             _context.Donations.Add(donation);
-                            _context.SaveChanges();
+                             _context.SaveChanges();
+                            
 
-                            // await hubContext.Clients.All.SendAsync("ReceiveNotification", "Donacion i ri ne shumen prej :!" + paymentIntent.AmountSubtotal.ToString());
+                           // await hubContext.Clients.All.SendAsync("ReceiveNotification", "Donacion i ri ne shumen prej :!" + paymentIntent.AmountSubtotal.ToString());
                             var notification = new NotificationDto
                             {
                                 UserId = 1 ,
@@ -232,9 +233,8 @@ namespace upLiftUnity_API.Controllers
                                 Text = $"A new donation of {donation.Amount} euros has been received.",
                                 NotificationEvent = "success"
                             };
-
-                            await _hubContext.Clients.Groups(notification.UserId.ToString())
-                               .SendNotificationToClient(notification);
+                            Console.WriteLine("Sending notification: " + notification.Text);
+                            await _hubContext.Clients.Group(notification.UserId.ToString()).SendNotificationToClient(notification);
 
                             return Ok("Donacioni është ruajtur me sukses!");
                           
