@@ -13,6 +13,10 @@ using System;
 using Microsoft.AspNetCore.Authorization; // Add this namespace for Task
 using System.Linq; // Add this namespace for Any method
 using Stripe.Checkout;
+using Microsoft.AspNetCore.SignalR;
+using upLiftUnity_API.Repositories.NotificationRepository;
+using upLiftUnity_API.DTOs.NotificationDtos;
+using IClientNotificationHub = upLiftUnity_API.Repositories.NotificationRepository.IClientNotificationHub;
 
 
 namespace upLiftUnity_API.Controllers
@@ -25,12 +29,16 @@ namespace upLiftUnity_API.Controllers
         private readonly IDonationRepository _donation;
         private readonly ILogger<DonationController> _logger;
         private readonly IConfiguration _config;
-        public DonationController(APIDbContext _dbcontext, IDonationRepository _dbDonations, ILogger<DonationController> logger, IConfiguration config)
+        private readonly IHubContext<NotificationHub, IClientNotificationHub> _hubContext;
+        public DonationController(APIDbContext _dbcontext, IDonationRepository _dbDonations,
+                                  ILogger<DonationController> logger, IConfiguration config,
+                                  IHubContext<NotificationHub, IClientNotificationHub> hubContext)
         {
             _context = _dbcontext;
             _donation = _dbDonations;
             _logger = logger;
             _config = config;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -93,8 +101,6 @@ namespace upLiftUnity_API.Controllers
                 string successUrl = _config["Urls:SuccessUrl"];
                 string cancelUrl = _config["Urls:CancelUrl"];
 
-
-                // Determine the package details based on the packageId received from the front end
                 string packageName;
                 int unitAmount;
 
@@ -169,8 +175,8 @@ namespace upLiftUnity_API.Controllers
         [HttpPost]
         [Route("webhook")]
         public async Task<IActionResult> Index()
-        {
-
+       //public async Task<IActionResult> Index([FromServices] IHubContext<IClientNotificationHub> hubContext)
+        {   
             try
             {
                 var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
@@ -217,14 +223,25 @@ namespace upLiftUnity_API.Controllers
                             }
                             _context.Donations.Add(donation);
                             _context.SaveChanges();
-                 
+
+                            // await hubContext.Clients.All.SendAsync("ReceiveNotification", "Donacion i ri ne shumen prej :!" + paymentIntent.AmountSubtotal.ToString());
+                            var notification = new NotificationDto
+                            {
+                                UserId = 1 ,
+                                Title = "New Donation Received!",
+                                Text = $"A new donation of {donation.Amount} euros has been received.",
+                                NotificationEvent = "success"
+                            };
+
+                            await _hubContext.Clients.Groups(notification.UserId.ToString())
+                               .SendNotificationToClient(notification);
+
                             return Ok("Donacioni është ruajtur me sukses!");
                           
                         }
                         catch (Exception ex)
                         {
                             _logger.LogError(ex, "Error saving donation to database");
-
                             return StatusCode(500, "Error saving donation to database");
                         }
                     case "payment_intent.created":

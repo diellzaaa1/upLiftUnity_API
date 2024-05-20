@@ -11,21 +11,22 @@ using upLiftUnity_API.Repositories.ApplicationRepository;
 using upLiftUnity_API.Repositories.DonationRepository;
 using upLiftUnity_API.Repositories.ScheduleRepository;
 using upLiftUnity_API.Repositories.UserRepository;
-
+using Microsoft.AspNetCore.SignalR;
 using upLiftUnity_API.MongoModels;
 using upLiftUnity_API.Services.EmailSender;
+using upLiftUnity_API.Repositories.NotificationRepository;
+using upLiftUnity_API.Services;
 
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
@@ -41,8 +42,10 @@ builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddScoped<IActivitiesRepository, ActivitiesRepository>();
 builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<IEmailSender,EmailSender>();
-
-
+builder.Services.AddScoped<NotificationHub>();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<NotificationHub>();
+builder.Services.AddScoped<NotificationService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -84,32 +87,33 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+       builder
+           .WithOrigins("http://localhost:8080", "http://localhost:8081", "http://localhost:8082","http://localhost:8080/#/notifications/notificationHub") // Allow requests from this origin
+           .AllowAnyMethod()
+           .AllowAnyHeader()
+           .AllowCredentials()); 
+});
 
 
 
 var app = builder.Build();
 
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors(
-    options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
-);
-
+//app.UseCors(
+//    options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+//);
+app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
-
-
 app.MapControllers();
-
+app.MapHub<NotificationHub>("/notificationHub");
 app.Run();
