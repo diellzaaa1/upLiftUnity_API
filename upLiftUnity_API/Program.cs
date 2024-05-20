@@ -16,6 +16,7 @@ using upLiftUnity_API.MongoModels;
 using upLiftUnity_API.Services.EmailSender;
 using upLiftUnity_API.Repositories.NotificationRepository;
 using upLiftUnity_API.Services;
+using upLiftUnity_API.RealTimeChat.Hubs;
 
 
 
@@ -117,4 +118,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<NotificationHub>("/notificationHub");
+app.MapHub<ChatHub>("Chat");
 app.Run();
