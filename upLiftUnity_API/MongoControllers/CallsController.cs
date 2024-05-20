@@ -21,18 +21,32 @@ namespace upLiftUnity_API.MongoControllers
         {
             return await _calls.Find(FilterDefinition<Call>.Empty).ToListAsync();
         }
+
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<Call>> GetById(string id)
+        public async Task<IActionResult> GetCallById(string id)
         {
-            if (!ObjectId.TryParse(id, out ObjectId objectId))
+            try
             {
-                return BadRequest("Invalid ObjectId format.");
+                var callId = Guid.Parse(id);
+
+                var call = await _calls.Find(x => x.CallId == callId).FirstOrDefaultAsync();
+
+                if (call == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(call);
             }
-
-            var filter = Builders<Call>.Filter.Eq(x => x.Id, objectId);
-            var call = await _calls.Find(filter).FirstOrDefaultAsync();
-
-            return call != null ? Ok(call) : NotFound();
+            catch (FormatException)
+            {
+                return BadRequest("Invalid ID format");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
 
 

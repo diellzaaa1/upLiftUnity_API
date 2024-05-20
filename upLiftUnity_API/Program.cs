@@ -18,6 +18,7 @@ using upLiftUnity_API.Services.EmailSender;
 
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -41,8 +42,6 @@ builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddScoped<IActivitiesRepository, ActivitiesRepository>();
 builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<IEmailSender,EmailSender>();
-
-
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
