@@ -1,58 +1,44 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using System.Collections.Concurrent;
-using upLiftUnity_API.RealTimeChat.Model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace upLiftUnity_API.RealTimeChat.Hubs
 {
     public class ChatHub : Hub
     {
+        private static readonly ConcurrentDictionary<string, string> Users = new ConcurrentDictionary<string, string>();
 
-
-        static ConcurrentDictionary<string, string> dic = new ConcurrentDictionary<string, string>();
-
-        public void Send(string name, string message)
+        public override async Task OnConnectedAsync()
         {
-            Clients.All.SendAsync("broadcastMessage", name, message);
-        }
+            var email = Context.GetHttpContext().Request.Query["email"];
 
-        public void SendToSpecific(string name, string message, string to)
-        {
-            if (dic.TryGetValue(to, out var connectionId))
+            if (!string.IsNullOrEmpty(email))
             {
-                Clients.Client(connectionId).SendAsync("broadcastMessage", name, message);
+                Users[email] = Context.ConnectionId;
             }
-        }
 
-        public void Notify(string name, string id)
-        {
-            if (dic.ContainsKey(name))
-            {
-                Clients.Caller.SendAsync("differentName");
-            }
-            else
-            {
-                dic.TryAdd(name, id);
-                foreach (var entry in dic)
-                {
-                    Clients.Caller.SendAsync("online", entry.Key);
-                }
-                Clients.Others.SendAsync("enters", name);
-            }
+            await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            var name = dic.FirstOrDefault(x => x.Value == Context.ConnectionId.ToString());
-            if (name.Key != null)
+            var email = Context.GetHttpContext().Request.Query["email"];
+
+            if (!string.IsNullOrEmpty(email))
             {
-                dic.TryRemove(name.Key, out _);
-                await Clients.All.SendAsync("disconnected", name.Key);
+                Users.TryRemove(email, out _);
             }
+
             await base.OnDisconnectedAsync(exception);
         }
+
+        public async Task SendToSpecific(string sender, string message, string recipient)
+        {
+            if (Users.TryGetValue(recipient, out string connectionId))
+            {
+                await Clients.Client(connectionId).SendAsync("broadcastMessage", sender, message);
+            }
+        }
     }
-}
+    }

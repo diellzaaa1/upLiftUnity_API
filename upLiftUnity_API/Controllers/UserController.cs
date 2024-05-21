@@ -41,10 +41,11 @@ namespace upLiftUnity_API.Controllers
             LogUserActivity(user.Id, ipAddress);
 
             var roleName = _user.GetUserRole(user.RoleId);
+            var email = Request.Email;
 
-            var token = TokenService.GenerateToken(user.Id, roleName);
+            var token = TokenService.GenerateToken(user.Id, roleName,email);
 
-            // Kthe një objekt anonim si përgjigje
+           
             return Ok(new
             {
                 IsAuthenticated = true,
