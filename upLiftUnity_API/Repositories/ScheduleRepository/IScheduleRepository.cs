@@ -18,6 +18,8 @@ namespace upLiftUnity_API.Repositories.ScheduleRepository
         bool DeleteSchedule(int Id);
 
         public  Task<Schedule> GetScheduleByUserIdAndMonth(int userId, int month, int year);
+
+        
         
     }
 }
