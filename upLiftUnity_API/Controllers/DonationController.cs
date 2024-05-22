@@ -10,13 +10,16 @@ using Stripe;
 using Stripe.Checkout;
 using System.IO;
 using System;
-using Microsoft.AspNetCore.Authorization; // Add this namespace for Task
-using System.Linq; // Add this namespace for Any method
+using Microsoft.AspNetCore.Authorization;
+using System.Linq; 
 using Stripe.Checkout;
 using Microsoft.AspNetCore.SignalR;
 using upLiftUnity_API.Repositories.NotificationRepository;
 using upLiftUnity_API.DTOs.NotificationDtos;
 using IClientNotificationHub = upLiftUnity_API.Repositories.NotificationRepository.IClientNotificationHub;
+using upLiftUnity_API.Repositories.UserRepository;
+
+
 
 
 namespace upLiftUnity_API.Controllers
@@ -30,15 +33,23 @@ namespace upLiftUnity_API.Controllers
         private readonly ILogger<DonationController> _logger;
         private readonly IConfiguration _config;
         private readonly IHubContext<NotificationHub, IClientNotificationHub> _hubContext;
+        private readonly IUserRepository _userRepository;
+     
+
+
+
         public DonationController(APIDbContext _dbcontext, IDonationRepository _dbDonations,
                                   ILogger<DonationController> logger, IConfiguration config,
-                                  IHubContext<NotificationHub, IClientNotificationHub> hubContext)
+                                  IHubContext<NotificationHub, IClientNotificationHub> hubContext,
+                                  IUserRepository userRepository)
         {
             _context = _dbcontext;
             _donation = _dbDonations;
             _logger = logger;
             _config = config;
             _hubContext = hubContext;
+            _userRepository = userRepository;
+          
         }
 
         [HttpGet]
@@ -175,7 +186,6 @@ namespace upLiftUnity_API.Controllers
         [HttpPost]
         [Route("webhook")]
         public async Task<IActionResult> Index()
-       //public async Task<IActionResult> Index([FromServices] IHubContext<IClientNotificationHub> hubContext)
         {   
             try
             {
@@ -225,16 +235,33 @@ namespace upLiftUnity_API.Controllers
                              _context.SaveChanges();
                             
 
-                           // await hubContext.Clients.All.SendAsync("ReceiveNotification", "Donacion i ri ne shumen prej :!" + paymentIntent.AmountSubtotal.ToString());
+                         
                             var notification = new NotificationDto
                             {
-                                UserId = 1 ,
                                 Title = "New Donation Received!",
-                                Text = $"A new donation of {donation.Amount} euros has been received.",
-                                NotificationEvent = "success"
+                                Text = $"A new donation of {donation.Amount} cents has been received.",
+                                NotificationEvent = "success",
+                                CreatedOnUtc = DateTime.UtcNow
                             };
-                            Console.WriteLine("Sending notification: " + notification.Text);
-                            await _hubContext.Clients.Group(notification.UserId.ToString()).SendNotificationToClient(notification);
+
+                            //  useers with roleId = 1
+                            var users = await _userRepository.GetUsersByRoleId(1);
+                            foreach (var user in users)
+                            {
+                                notification.UserId = user.Id;
+                                await _hubContext.Clients.Group(user.Id.ToString()).SendNotificationToClient(notification);
+                            }
+
+                            //var notificationToSave = new Notification
+                            //{
+                            //    Title = notification.Title,
+                            //    Text = notification.Text,
+                            //   NotificationId = Guid.NewGuid(),
+                            //    IsRead = false,
+                            //    CreatedOnUtc = DateTime.UtcNow
+                            //};
+
+                            //await _notificationRepo.CreateAsync(notificationToSave);
 
                             return Ok("Donacioni është ruajtur me sukses!");
                           

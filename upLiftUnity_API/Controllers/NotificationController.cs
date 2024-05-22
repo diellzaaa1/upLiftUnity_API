@@ -32,7 +32,7 @@ namespace upLiftUnity_API.Controllers
                 var notification = new NotificationDto()
                 {
                     UserId = user.Id,
-                    IsAcknowledged = false,
+                    IsRead = false,
                     RelativeNotifiedDateAndTime = GetRelativeNotifiedDateAndTime(DateTime.Now),
                     Title = "Client Updated.",
                     Text = "Client details have been updated successfully by the system admin.",
@@ -136,4 +136,9 @@ namespace upLiftUnity_API.Controllers
                 return timeSpan.Seconds;
         }
     }
+
+
+
+
+
 }
