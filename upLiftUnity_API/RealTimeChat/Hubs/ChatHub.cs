@@ -48,23 +48,22 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
         {
             if (Users.TryGetValue(recipient, out string connectionId))
             {
+                Console.WriteLine("Recipient found in Users dictionary. Sending message...");
+
                 await Clients.Client(connectionId).SendAsync("broadcastMessage", sender, message);
 
-                // Ensure the conversation exists
                 var conversation = await _conversationRepository.GetOrCreateConversationAsync(sender, recipient);
+                Console.WriteLine($"Conversation created: {conversation}");
 
-                Console.WriteLine(conversation);
-
-                // Buffer the message
-                var bufferedMessage = new Message
-                {
+                var bufferedMessage = new Model.Message{
                     Content = message,
                     ConversationId = conversation.ConversationId,
-                    CreatedAt = DateTime.Now
                 };
 
                 _messageBufferService.AddMessageToBuffer(bufferedMessage);
+                Console.WriteLine($"Message added to buffer: {bufferedMessage}");
             }
         }
+
     }
 }

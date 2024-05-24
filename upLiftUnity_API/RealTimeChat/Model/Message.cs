@@ -8,7 +8,7 @@ namespace upLiftUnity_API.RealTimeChat.Model
         [Key]
         public int MessageId { get; set; }
 
-        public string Content { get; set; }
+        public string Content{ get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 

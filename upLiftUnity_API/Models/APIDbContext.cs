@@ -18,15 +18,13 @@ namespace upLiftUnity_API.Models
        
         public DbSet<Rules> Rules { get; set; }
         public DbSet<Schedule> Schedule { get; set; }
+        public DbSet<UserActivity> UserActivities { get; set; }
+
 
         public DbSet<RealTimeChat.Model.Conversation> Conversation { get; set; }
 
         public DbSet<Message> Message { get; set; }
 
-
-
-
-        public DbSet<Conversation> UserActivities { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureUser(modelBuilder);
@@ -63,7 +61,7 @@ namespace upLiftUnity_API.Models
         }
         private void ConfigureUserActivities(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Conversation>()
+            modelBuilder.Entity<UserActivity>()
              .HasOne(c => c.User)
              .WithMany()
              .HasForeignKey(c => c.UserId);

@@ -55,7 +55,7 @@ namespace upLiftUnity_API.Controllers
         }
         private void LogUserActivity(int userId, string ipAddress)
         {
-            var userActivity = new Conversation
+            var userActivity = new UserActivity
             {
                 UserId = userId,
                 IPAddress = ipAddress,
