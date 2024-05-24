@@ -51,5 +51,25 @@ namespace upLiftUnity_API.RealTimeChat.Repositories
 
             return conversation;
         }
+
+        public async Task<int> GetConversationIdByEmailsAsync(string senderEmail, string receiverEmail)
+        {
+            var conversation = await _context.Conversation
+                .FirstOrDefaultAsync(c =>
+                    (c.SenderEmail == senderEmail && c.ReciverEmail == receiverEmail) ||
+                    (c.SenderEmail == receiverEmail && c.ReciverEmail == senderEmail)
+                );
+
+            if (conversation == null)
+            {
+                // Kthe -1 nëse nuk ka konversation
+                return -1;
+            }
+
+            return conversation.ConversationId;
+        }
+
     }
+
+
 }

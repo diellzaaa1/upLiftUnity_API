@@ -10,5 +10,8 @@ namespace upLiftUnity_API.RealTimeChat.Repositories
         Task<IEnumerable<Conversation>> GetConversationsByEmailAsync(string email);
         Task<Conversation> GetOrCreateConversationAsync(string senderEmail, string receiverEmail);
 
+        Task<int> GetConversationIdByEmailsAsync(string senderEmail, string receiverEmail);
+
+
     }
 }

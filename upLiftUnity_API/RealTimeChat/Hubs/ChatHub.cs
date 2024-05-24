@@ -50,7 +50,10 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
 
         public async Task SendToSpecific(string sender, string message, string recipient)
         {
-            if (Users.TryGetValue(recipient, out string connectionId))
+            string connectionId = null;
+
+            // Kontrolloni nëse përdoruesi është i lidhur
+            if (Users.TryGetValue(recipient, out connectionId))
             {
                 Console.WriteLine("Recipient found in Users dictionary. Sending message...");
 
@@ -68,6 +71,24 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
                 _messageBufferService.AddMessageToBuffer(bufferedMessage);
                 Console.WriteLine($"Message added to buffer: {bufferedMessage.Content}");
             }
+            else
+            {
+                Console.WriteLine($"Recipient {recipient} is not connected. Message will be buffered.");
+
+                // Nëse përdoruesi nuk është i lidhur, shtoni mesazhin në buffer
+                var conversation = await _conversationRepository.GetOrCreateConversationAsync(sender, recipient);
+                Console.WriteLine($"Conversation created: {conversation}");
+
+                var bufferedMessage = new Message
+                {
+                    Content = message,
+                    ConversationId = conversation.ConversationId,
+                };
+
+                _messageBufferService.AddMessageToBuffer(bufferedMessage);
+                Console.WriteLine($"Message added to buffer: {bufferedMessage.Content}");
+            }
         }
+
     }
 }
