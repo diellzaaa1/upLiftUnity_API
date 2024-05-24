@@ -1,21 +1,23 @@
-﻿
-using System.Collections.Concurrent;
-
+﻿using System.Collections.Concurrent;
 using upLiftUnity_API.RealTimeChat.Model;
 using upLiftUnity_API.RealTimeChat.Repository.MessageRepository;
-
+using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace upLiftUnity_API.RealTimeChat.Services
 {
-    public class MessageBufferService : BackgroundService
+    public class MessageBufferService
     {
-        private readonly IMessageRepository _messageRepository;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ConcurrentQueue<Message> _messageBuffer;
         private readonly TimeSpan _interval = TimeSpan.FromSeconds(5);
+        private Task _processingTask;
+        private CancellationTokenSource _cancellationTokenSource;
 
-        public MessageBufferService(IMessageRepository messageRepository)
+        public MessageBufferService(IServiceProvider serviceProvider)
         {
-            _messageRepository = messageRepository;
+            _serviceProvider = serviceProvider;
             _messageBuffer = new ConcurrentQueue<Message>();
         }
 
@@ -25,9 +27,30 @@ namespace upLiftUnity_API.RealTimeChat.Services
             Console.WriteLine($"Message added to buffer: {message.Content}");
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        public void StartProcessing()
         {
+            if (_processingTask != null && !_processingTask.IsCompleted)
+            {
+                Console.WriteLine("Message processing is already running.");
+                return;
+            }
+
+            _cancellationTokenSource = new CancellationTokenSource();
+            _processingTask = Task.Run(() => ProcessMessagesAsync(_cancellationTokenSource.Token));
             Console.WriteLine("Message buffer service started.");
+        }
+
+        public void StopProcessing()
+        {
+            if (_cancellationTokenSource != null)
+            {
+                _cancellationTokenSource.Cancel();
+                Console.WriteLine("Message buffer service stopping...");
+            }
+        }
+
+        private async Task ProcessMessagesAsync(CancellationToken stoppingToken)
+        {
             while (!stoppingToken.IsCancellationRequested)
             {
                 Console.WriteLine("Executing SaveMessagesToDatabase...");
@@ -36,7 +59,6 @@ namespace upLiftUnity_API.RealTimeChat.Services
                 await Task.Delay(_interval, stoppingToken);
             }
         }
-
 
         private async Task SaveMessagesToDatabase()
         {
@@ -53,20 +75,28 @@ namespace upLiftUnity_API.RealTimeChat.Services
 
             if (messagesToSave.Count > 0)
             {
-                foreach (var message in messagesToSave)
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    try
+                    var messageRepository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
+
+                    foreach (var message in messagesToSave)
                     {
-                        await _messageRepository.SaveMessageAsync(message);
-                        Console.WriteLine($"Message saved: {message.Content}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error saving message: {ex.Message}");
+                        try
+                        {
+                            await messageRepository.SaveMessageAsync(message);
+                            Console.WriteLine($"Message saved: {message.Content}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error saving message: {ex.Message}");
+                        }
                     }
                 }
             }
+            else
+            {
+                Console.WriteLine("No messages found in the buffer.");
+            }
         }
-
     }
 }

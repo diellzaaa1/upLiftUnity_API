@@ -29,6 +29,8 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
                 Users[email] = Context.ConnectionId;
             }
 
+            _messageBufferService.StartProcessing();
+
             await base.OnConnectedAsync();
         }
 
@@ -40,6 +42,8 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
             {
                 Users.TryRemove(email, out _);
             }
+
+            _messageBufferService.StopProcessing();
 
             await base.OnDisconnectedAsync(exception);
         }
@@ -55,15 +59,15 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
                 var conversation = await _conversationRepository.GetOrCreateConversationAsync(sender, recipient);
                 Console.WriteLine($"Conversation created: {conversation}");
 
-                var bufferedMessage = new Model.Message{
+                var bufferedMessage = new Message
+                {
                     Content = message,
                     ConversationId = conversation.ConversationId,
                 };
 
                 _messageBufferService.AddMessageToBuffer(bufferedMessage);
-                Console.WriteLine($"Message added to buffer: {bufferedMessage}");
+                Console.WriteLine($"Message added to buffer: {bufferedMessage.Content}");
             }
         }
-
     }
 }

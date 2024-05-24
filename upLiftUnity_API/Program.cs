@@ -57,7 +57,7 @@ builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 // Register the background service
-builder.Services.AddScoped<MessageBufferService>();
+builder.Services.AddSingleton<MessageBufferService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
