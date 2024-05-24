@@ -12,7 +12,7 @@ namespace upLiftUnity_API.Repositories.ActivitiesRepository
             _appDBContext = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<IEnumerable<UserActivity>> GetUserActivities()
+        public async Task<IEnumerable<Conversation>> GetUserActivities()
         {
             return await _appDBContext.UserActivities
                 .Include(a => a.User) 
@@ -20,7 +20,7 @@ namespace upLiftUnity_API.Repositories.ActivitiesRepository
         }
 
 
-        public async Task<IEnumerable<UserActivity>> GetUserActivityById(int id)
+        public async Task<IEnumerable<Conversation>> GetUserActivityById(int id)
         {
             return await _appDBContext.UserActivities
                 .Where(activity => activity.UserId == id)

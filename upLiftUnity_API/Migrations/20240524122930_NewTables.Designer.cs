@@ -12,8 +12,8 @@ using upLiftUnity_API.Models;
 namespace upLiftUnity_API.Migrations
 {
     [DbContext(typeof(APIDbContext))]
-    [Migration("20240507132942_addNewTables")]
-    partial class addNewTables
+    [Migration("20240524122930_NewTables")]
+    partial class NewTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,30 +25,29 @@ namespace upLiftUnity_API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("upLiftUnity_API.Models.Calls", b =>
+            modelBuilder.Entity("upLiftUnity_API.Models.Conversation", b =>
                 {
-                    b.Property<int>("CallId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CallId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CallerNickname")
+                    b.Property<string>("IPAddress")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Risk_Level")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("LoginTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("CallId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Calls");
+                    b.ToTable("UserActivities");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.Donations", b =>
@@ -140,30 +139,14 @@ namespace upLiftUnity_API.Migrations
                     b.Property<DateTime>("FirstDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FirstSlot")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("FourthDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("FourthSlot")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("SecondDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("SecondSlot")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("ThirdDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("ThirdSlot")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -258,32 +241,56 @@ namespace upLiftUnity_API.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("upLiftUnity_API.Models.UserActivity", b =>
+            modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Conversation", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ConversationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConversationId"));
 
-                    b.Property<string>("IPAddress")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReciverEmail")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LoginTime")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.HasKey("ConversationId");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserActivities");
+                    b.ToTable("Conversation");
                 });
 
-            modelBuilder.Entity("upLiftUnity_API.Models.Calls", b =>
+            modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Message", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageId"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.ToTable("Message");
+                });
+
+            modelBuilder.Entity("upLiftUnity_API.Models.Conversation", b =>
                 {
                     b.HasOne("upLiftUnity_API.Models.User", "User")
                         .WithMany()
@@ -327,15 +334,15 @@ namespace upLiftUnity_API.Migrations
                     b.Navigation("UserRole");
                 });
 
-            modelBuilder.Entity("upLiftUnity_API.Models.UserActivity", b =>
+            modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Message", b =>
                 {
-                    b.HasOne("upLiftUnity_API.Models.User", "User")
+                    b.HasOne("upLiftUnity_API.RealTimeChat.Model.Conversation", "Conversation")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Conversation");
                 });
 #pragma warning restore 612, 618
         }

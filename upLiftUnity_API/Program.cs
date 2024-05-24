@@ -17,6 +17,9 @@ using upLiftUnity_API.Services.EmailSender;
 using upLiftUnity_API.Repositories.NotificationRepository;
 using upLiftUnity_API.Services;
 using upLiftUnity_API.RealTimeChat.Hubs;
+using upLiftUnity_API.RealTimeChat.Repositories;
+using upLiftUnity_API.RealTimeChat.Repository.MessageRepository;
+using upLiftUnity_API.RealTimeChat.Services;
 
 
 
@@ -48,6 +51,11 @@ builder.Services.AddScoped<NotificationHub>();
 builder.Services.AddSignalR();
 //builder.Services.AddScoped<NotificationHub>();
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
+// Register the background service
+builder.Services.AddScoped<MessageBufferService>();
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

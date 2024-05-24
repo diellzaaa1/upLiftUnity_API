@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace upLiftUnity_API.Models
 {
-    public class UserActivity
+    public class Conversation
     {
         [Key]
         public int Id { get; set; }

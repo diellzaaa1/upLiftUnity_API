@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OpenAI_API.Chat;
+using upLiftUnity_API.RealTimeChat.Model;
 
 namespace upLiftUnity_API.Models
 {
@@ -17,13 +19,21 @@ namespace upLiftUnity_API.Models
         public DbSet<Rules> Rules { get; set; }
         public DbSet<Schedule> Schedule { get; set; }
 
-        public DbSet<UserActivity> UserActivities { get; set; }
+        public DbSet<RealTimeChat.Model.Conversation> Conversation { get; set; }
+
+        public DbSet<Message> Message { get; set; }
+
+
+
+
+        public DbSet<Conversation> UserActivities { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureUser(modelBuilder);
             ConfigureRules(modelBuilder);
             ConfigureSchedule(modelBuilder);
             ConfigureUserActivities(modelBuilder);
+            ConfigureMessage(modelBuilder);
         }
 
         private void ConfigureUser(ModelBuilder modelBuilder)
@@ -53,10 +63,19 @@ namespace upLiftUnity_API.Models
         }
         private void ConfigureUserActivities(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserActivity>()
+            modelBuilder.Entity<Conversation>()
              .HasOne(c => c.User)
              .WithMany()
              .HasForeignKey(c => c.UserId);
         }
+
+        private void ConfigureMessage(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Message>()
+             .HasOne(c => c.Conversation)
+             .WithMany()
+             .HasForeignKey(c => c.ConversationId);
+        }
+
     }
 }

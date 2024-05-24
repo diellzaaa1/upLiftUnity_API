@@ -22,6 +22,31 @@ namespace upLiftUnity_API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("upLiftUnity_API.Models.Conversation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IPAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LoginTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserActivities");
+                });
+
             modelBuilder.Entity("upLiftUnity_API.Models.Donations", b =>
                 {
                     b.Property<int>("DonationID")
@@ -111,30 +136,14 @@ namespace upLiftUnity_API.Migrations
                     b.Property<DateTime>("FirstDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FirstSlot")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("FourthDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("FourthSlot")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("SecondDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("SecondSlot")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("ThirdDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("ThirdSlot")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -229,29 +238,64 @@ namespace upLiftUnity_API.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("upLiftUnity_API.Models.UserActivity", b =>
+            modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Conversation", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ConversationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConversationId"));
 
-                    b.Property<string>("IPAddress")
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReciverEmail")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LoginTime")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.HasKey("ConversationId");
+
+                    b.ToTable("Conversation");
+                });
+
+            modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Message", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageId"));
 
-                    b.HasIndex("UserId");
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("UserActivities");
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.ToTable("Message");
+                });
+
+            modelBuilder.Entity("upLiftUnity_API.Models.Conversation", b =>
+                {
+                    b.HasOne("upLiftUnity_API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.Rules", b =>
@@ -287,15 +331,15 @@ namespace upLiftUnity_API.Migrations
                     b.Navigation("UserRole");
                 });
 
-            modelBuilder.Entity("upLiftUnity_API.Models.UserActivity", b =>
+            modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Message", b =>
                 {
-                    b.HasOne("upLiftUnity_API.Models.User", "User")
+                    b.HasOne("upLiftUnity_API.RealTimeChat.Model.Conversation", "Conversation")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Conversation");
                 });
 #pragma warning restore 612, 618
         }

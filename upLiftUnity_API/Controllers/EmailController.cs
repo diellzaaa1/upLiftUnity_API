@@ -43,7 +43,7 @@ namespace upLiftUnity_API.Controllers
             }
 
             var emailSubject = "Hapja e afatit për përzgjedhjen e orarit";
-            string currentMonth = DateTime.Now.ToString("MMMM", new CultureInfo("sq-AL")); // "MMMM" për formatin e plotë të muajit, "sq-AL" për shqip
+            string currentMonth = DateTime.Now.ToString("MMMM", new CultureInfo("sq-AL")); 
 
             // Përditëso mesazhin me muajin aktual
             var message = $"Të nderuar përdorues,\n\n"
