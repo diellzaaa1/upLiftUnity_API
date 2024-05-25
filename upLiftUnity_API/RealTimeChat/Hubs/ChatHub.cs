@@ -52,7 +52,6 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
         {
             string connectionId = null;
 
-            // Kontrolloni nëse përdoruesi është i lidhur
             if (Users.TryGetValue(recipient, out connectionId))
             {
                 Console.WriteLine("Recipient found in Users dictionary. Sending message...");
@@ -66,6 +65,8 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
                 {
                     Content = message,
                     ConversationId = conversation.ConversationId,
+                    Sender = sender,      // Kjo rresht shton Sender
+                    Reciever = recipient  // Kjo rresht shton Reciever
                 };
 
                 _messageBufferService.AddMessageToBuffer(bufferedMessage);
@@ -75,7 +76,6 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
             {
                 Console.WriteLine($"Recipient {recipient} is not connected. Message will be buffered.");
 
-                // Nëse përdoruesi nuk është i lidhur, shtoni mesazhin në buffer
                 var conversation = await _conversationRepository.GetOrCreateConversationAsync(sender, recipient);
                 Console.WriteLine($"Conversation created: {conversation}");
 
@@ -83,12 +83,15 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
                 {
                     Content = message,
                     ConversationId = conversation.ConversationId,
+                    Sender = sender,
+                    Reciever = recipient
                 };
 
                 _messageBufferService.AddMessageToBuffer(bufferedMessage);
                 Console.WriteLine($"Message added to buffer: {bufferedMessage.Content}");
             }
         }
+
 
     }
 }

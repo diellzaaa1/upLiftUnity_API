@@ -20,10 +20,10 @@ namespace upLiftUnity_API.RealTimeChat.Controller
         }
 
         [HttpGet("conversation")]
-        public async Task<ActionResult<IEnumerable<Message>>> GetMessagesByConversationId(string senderEmail, string receiverEmail)
+        public async Task<ActionResult<IEnumerable<Message>>> GetMessagesByConversationId(string user1, string user2)
         {
             
-            var conversation = await _conversationRepository.GetConversationIdByEmailsAsync(senderEmail, receiverEmail);
+            var conversation = await _conversationRepository.GetConversationIdByEmailsAsync(user1, user2);
 
             if (conversation == null)
             {
@@ -35,7 +35,7 @@ namespace upLiftUnity_API.RealTimeChat.Controller
 
             if (messages == null)
             {
-                return NotFound(); // Mesazhet nuk u gjetën për konversationin e caktuar
+                return NotFound();
             }
 
             return Ok(messages);

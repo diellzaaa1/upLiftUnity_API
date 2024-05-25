@@ -12,10 +12,15 @@ namespace upLiftUnity_API.RealTimeChat.Model
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+     
+
         [ForeignKey("ConversationId")]
         public int ConversationId { get; set; }
 
         public Conversation? Conversation { get; }
+
+        public string Sender { get; set; }
+        public string Reciever { get; set; }
 
     }
 }
