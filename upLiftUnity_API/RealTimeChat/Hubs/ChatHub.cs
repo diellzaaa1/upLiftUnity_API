@@ -58,6 +58,7 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
                 Console.WriteLine("Recipient found in Users dictionary. Sending message...");
 
                 await Clients.Client(connectionId).SendAsync("broadcastMessage", sender, message);
+                await Clients.Client(connectionId).SendAsync("newMessageNotification", sender);
 
                 var conversation = await _conversationRepository.GetOrCreateConversationAsync(sender, recipient);
                 Console.WriteLine($"Conversation created: {conversation}");
