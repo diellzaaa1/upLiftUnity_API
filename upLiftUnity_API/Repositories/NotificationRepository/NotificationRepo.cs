@@ -3,16 +3,20 @@ using upLiftUnity_API.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using upLiftUnity_API.Repositories.NotificationRepository;
+using upLiftUnity_API.MongoModels;
 
 namespace upLiftUnity_API.Repositories
 {
-    public class NotificationRepo
+    public class NotificationRepo : INotificationRepository
     {
         private readonly IMongoCollection<Notification> _notifications;
+        private readonly MongoDbContext _dbContext;
 
-        public NotificationRepo(IMongoDatabase database)
+        public NotificationRepo(MongoDbContext context)
         {
-            _notifications = database.GetCollection<Notification>("Notifications");
+            _dbContext = context;
+            _notifications = context.Database.GetCollection<Notification>("notification");
         }
 
         public async Task<List<Notification>> GetAllAsync()
@@ -20,9 +24,9 @@ namespace upLiftUnity_API.Repositories
             return await _notifications.Find(_ => true).ToListAsync();
         }
  
-        public async Task CreateAsync(Notification notification)
+        public async Task CreateNotificationAsync(Notification notification)
         {
-            await _notifications.InsertOneAsync(notification);
+             await _notifications.InsertOneAsync(notification);
         }
 
         public async Task UpdateIsReadAsync(Guid notificationId, bool isRead)

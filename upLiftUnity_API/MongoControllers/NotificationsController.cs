@@ -4,59 +4,94 @@ using upLiftUnity_API.Models;
 using upLiftUnity_API.Services;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using System.Linq.Expressions;
+using upLiftUnity_API.MongoModels;
 
 namespace upLiftUnity_API.Controllers
 {
     [Route("/notifications")]
     [ApiController]
     
-    public class NotificationsController : ControllerBase
+    public class NotificationsController : Controller
     {
-        private readonly NotificationServ _notificationService;
+ 
+        private readonly IMongoCollection<Notification> _notifications;
+       
 
-        public NotificationsController(NotificationServ notificationService)
+        public NotificationsController(MongoDbContext mongoDbContext)
         {
-            _notificationService = notificationService;
+            _notifications = mongoDbContext.Database?.GetCollection<Notification>("notification");
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateNotification([FromBody] NotificationDto notificationDto)
-        {
-            var notification = new Notification
-            {
-                Title = notificationDto.Title,
-                Text = notificationDto.Text,
-                IsRead = notificationDto.IsRead,
-                CreatedOnUtc = notificationDto.CreatedOnUtc
-            };
-
-            await _notificationService.CreateNotificationAsync(notification);
-            return Ok(notification);
-        }
-
-
-        [HttpPut("Update/{id}")]
-        public async Task<IActionResult> UpdateNotification(string id, [FromBody] NotificationDto notificationDto)
+        public async Task<IActionResult> CreateNotification([FromBody] Notification notification)
         {
             try
             {
-                var existingNotification = await _notificationService.GetNotificationByIdAsync(id);
+                notification.NotificationId = Guid.NewGuid();
+                notification.Title = notification.Title;
+                notification.Text = notification.Text;
+                notification.CreatedOnUtc = DateTime.UtcNow;
+                notification.IsRead = notification.IsRead;
 
-                if (existingNotification == null)
+                await _notifications.InsertOneAsync(notification);
+                return Ok(notification);
+            }
+
+            catch (Exception ex)
+
+            {
+                return StatusCode(500, $"An error occurred:{ex.Message}");
+            }
+        }
+
+        [HttpPost("updateReadStatus")]
+        public async Task<IActionResult> UpdateReadStatus([FromBody] Notification updateReadStatusDto)
+        {
+            try
+            {
+                var filter = Builders<Notification>.Filter.Eq(n => n.NotificationId, updateReadStatusDto.NotificationId);
+                var update = Builders<Notification>.Update.Set(n => n.IsRead, updateReadStatusDto.IsRead);
+
+                var result = await _notifications.UpdateOneAsync(filter, update);
+
+                if (result.ModifiedCount == 1)
                 {
-                    return NotFound();
+                    return Ok();
                 }
-                existingNotification.IsRead = notificationDto.IsRead;
-
-                await _notificationService.UpdateNotificationAsync(id, existingNotification);
-
-                return NoContent(); 
+                else
+                {
+                    return NotFound("Notification not found.");
+                }
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
+        //[HttpPut("Update/{id}")]
+        //public async Task<IActionResult> UpdateNotification(string id, [FromBody] NotificationDto notificationDto)
+        //{
+        //    try
+        //    {
+        //        var existingNotification = await _notificationService.GetNotificationByIdAsync(id);
+
+        //        if (existingNotification == null)
+        //        {
+        //            return NotFound();
+        //        }
+        //       existingNotification.IsRead = notificationDto.IsRead;
+
+        //        await _notificationService.UpdateNotificationAsync(id, existingNotification);
+
+        //        return NoContent(); 
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"An error occurred: {ex.Message}");
+        //    }
+        //}
 
     }
 

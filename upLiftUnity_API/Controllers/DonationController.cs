@@ -34,14 +34,18 @@ namespace upLiftUnity_API.Controllers
         private readonly IConfiguration _config;
         private readonly IHubContext<NotificationHub, IClientNotificationHub> _hubContext;
         private readonly IUserRepository _userRepository;
-     
+        private readonly INotificationRepository _notificationRepository;
 
-
-
-        public DonationController(APIDbContext _dbcontext, IDonationRepository _dbDonations,
-                                  ILogger<DonationController> logger, IConfiguration config,
-                                  IHubContext<NotificationHub, IClientNotificationHub> hubContext,
-                                  IUserRepository userRepository)
+        public DonationController(
+            APIDbContext _dbcontext,
+            IDonationRepository _dbDonations,
+            ILogger<DonationController> logger, 
+            IConfiguration config,
+            IHubContext<NotificationHub,
+            IClientNotificationHub> hubContext,
+            IUserRepository userRepository,
+            INotificationRepository notificationRepository
+            )
         {
             _context = _dbcontext;
             _donation = _dbDonations;
@@ -49,7 +53,7 @@ namespace upLiftUnity_API.Controllers
             _config = config;
             _hubContext = hubContext;
             _userRepository = userRepository;
-          
+            _notificationRepository = notificationRepository;   
         }
 
         [HttpGet]
@@ -232,7 +236,7 @@ namespace upLiftUnity_API.Controllers
                                 return Conflict("Ky donacion eshte realizuar nje here!");
                             }
                             _context.Donations.Add(donation);
-                             _context.SaveChanges();
+                            _context.SaveChanges();
                             
 
                          
@@ -245,24 +249,22 @@ namespace upLiftUnity_API.Controllers
                             };
 
                             //  useers with roleId = 1
-                            var users = await _userRepository.GetUsersByRoleId(1);
+                            var users = await _userRepository.GetUsersByRoleId(2);
                             foreach (var user in users)
                             {
                                 notification.UserId = user.Id;
                                 await _hubContext.Clients.Group(user.Id.ToString()).SendNotificationToClient(notification);
                             }
 
-                            //var notificationToSave = new Notification
-                            //{
-                            //    Title = notification.Title,
-                            //    Text = notification.Text,
-                            //   NotificationId = Guid.NewGuid(),
-                            //    IsRead = false,
-                            //    CreatedOnUtc = DateTime.UtcNow
-                            //};
-
-                            //await _notificationRepo.CreateAsync(notificationToSave);
-
+                            await _notificationRepository.CreateNotificationAsync(new Notification()
+                            {
+                                Text = notification.Text,
+                                Title = notification.Title,
+                                CreatedOnUtc = notification.CreatedOnUtc,
+                                NotificationId = Guid.NewGuid(),
+                                IsRead = false,
+                            });
+                           
                             return Ok("Donacioni është ruajtur me sukses!");
                           
                         }

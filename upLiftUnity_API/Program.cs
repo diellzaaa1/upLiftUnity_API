@@ -20,6 +20,7 @@ using upLiftUnity_API.RealTimeChat.Hubs;
 using upLiftUnity_API.RealTimeChat.Repositories;
 using upLiftUnity_API.RealTimeChat.Repository.MessageRepository;
 using upLiftUnity_API.RealTimeChat.Services;
+using upLiftUnity_API.Repositories;
 
 
 
@@ -49,12 +50,11 @@ builder.Services.AddScoped<IActivitiesRepository, ActivitiesRepository>();
 builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<IEmailSender,EmailSender>();
 builder.Services.AddScoped<NotificationHub>();
-builder.Services.AddScoped<NotificationService>();
 builder.Services.AddSignalR();
-//builder.Services.AddScoped<NotificationHub>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddTransient<INotificationRepository, NotificationRepo>();
 
 // Register the background service
 builder.Services.AddSingleton<MessageBufferService>();

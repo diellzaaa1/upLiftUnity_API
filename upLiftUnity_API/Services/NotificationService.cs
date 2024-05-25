@@ -7,6 +7,7 @@ namespace upLiftUnity_API.Services
     public class NotificationService
     {
         private readonly IHubContext<NotificationHub, IClientNotificationHub> _hubContext;
+
         public NotificationService(IHubContext<NotificationHub, IClientNotificationHub> hubContext)
         {
             _hubContext = hubContext;

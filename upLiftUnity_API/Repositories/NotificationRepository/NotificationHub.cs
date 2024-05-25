@@ -23,7 +23,6 @@ namespace upLiftUnity_API.Repositories.NotificationRepository
             await Groups.AddToGroupAsync(NotificationsGroup, userId.ToString());
         }
 
-
         public async Task RegisterForWebNotifications(int userId, string roleName)
         {
            await Groups.AddToGroupAsync(Context.ConnectionId, userId.ToString());
