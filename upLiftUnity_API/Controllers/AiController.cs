@@ -45,21 +45,9 @@ namespace upLiftUnity_API.Controllers
             }
             catch (Exception ex)
             {
-                // Check if the exception is due to quota exceeded
-                if (ex.Message.Contains("TooManyRequests"))
-                {
-                    // Return a specific error message for quota exceeded
-                    return StatusCode(StatusCodes.Status429TooManyRequests, "API quota exceeded. Please try again later.");
-                }
-                else
-                {
-                    // Handle other exceptions and return an error response
-                    return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
-                }
+                // Return a specific error message
+                return StatusCode(StatusCodes.Status503ServiceUnavailable, "AI nuk eshte i qasshem per momentin");
             }
         }
     }
 }
-
-
-
