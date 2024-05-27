@@ -52,19 +52,25 @@ namespace upLiftUnity_API.Controllers
             }
             return Ok("Added Successfully");
         }
+
         [HttpPut]
         [Route("UpdateApplication/{id}")]
-
-        public async Task<IActionResult> Put(int id)
+        public async Task<IActionResult> Put(int id,string status)
         {
-            var updatedApplication = await applicationRepository.UpdateSupVol_Applications(id);
+
+            if (string.IsNullOrEmpty(status))
+            {
+                return BadRequest("The 'status' field is required.");
+            }
+
+            var updatedApplication = await applicationRepository.UpdateSupVol_Applications(id, status);
 
             if (updatedApplication == null)
             {
-                return NotFound(); // Kthe një përgjigje NotFound nëse aplikacioni nuk gjendet
+                return NotFound(); 
             }
 
-            return Ok("Updated Successfully"); // Kthe një përgjigje Ok nëse përditësimi është kryer me sukses
+            return Ok("Updated Successfully"); // Return an Ok response if the update is successful
         }
 
 

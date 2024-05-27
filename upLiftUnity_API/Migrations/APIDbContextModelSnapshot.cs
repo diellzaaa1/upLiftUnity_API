@@ -22,30 +22,29 @@ namespace upLiftUnity_API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("upLiftUnity_API.Models.Calls", b =>
+            modelBuilder.Entity("upLiftUnity_API.Models.Conversation", b =>
                 {
-                    b.Property<int>("CallId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CallId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CallerNickname")
+                    b.Property<string>("IPAddress")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Risk_Level")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("LoginTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("CallId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Calls");
+                    b.ToTable("UserActivities");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.Donations", b =>
@@ -124,6 +123,36 @@ namespace upLiftUnity_API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Rules");
+                });
+
+            modelBuilder.Entity("upLiftUnity_API.Models.Schedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("FirstDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FourthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("SecondDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ThirdDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Schedule");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.SupVol_Applications", b =>
@@ -209,7 +238,56 @@ namespace upLiftUnity_API.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("upLiftUnity_API.Models.Calls", b =>
+            modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Conversation", b =>
+                {
+                    b.Property<int>("ConversationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConversationId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReciverEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ConversationId");
+
+                    b.ToTable("Conversation");
+                });
+
+            modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Message", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MessageId"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.ToTable("Message");
+                });
+
+            modelBuilder.Entity("upLiftUnity_API.Models.Conversation", b =>
                 {
                     b.HasOne("upLiftUnity_API.Models.User", "User")
                         .WithMany()
@@ -231,6 +309,17 @@ namespace upLiftUnity_API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("upLiftUnity_API.Models.Schedule", b =>
+                {
+                    b.HasOne("upLiftUnity_API.Models.User", "UserSch")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserSch");
+                });
+
             modelBuilder.Entity("upLiftUnity_API.Models.User", b =>
                 {
                     b.HasOne("upLiftUnity_API.Models.Role", "UserRole")
@@ -240,6 +329,17 @@ namespace upLiftUnity_API.Migrations
                         .IsRequired();
 
                     b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Message", b =>
+                {
+                    b.HasOne("upLiftUnity_API.RealTimeChat.Model.Conversation", "Conversation")
+                        .WithMany()
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
                 });
 #pragma warning restore 612, 618
         }

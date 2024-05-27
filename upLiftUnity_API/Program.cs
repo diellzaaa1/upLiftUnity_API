@@ -6,20 +6,34 @@ using Stripe;
 using System.Text;
 using upLiftUnity_API.Controllers;
 using upLiftUnity_API.Models;
+using upLiftUnity_API.Repositories.ActivitiesRepository;
 using upLiftUnity_API.Repositories.ApplicationRepository;
 using upLiftUnity_API.Repositories.DonationRepository;
+using upLiftUnity_API.Repositories.ScheduleRepository;
 using upLiftUnity_API.Repositories.UserRepository;
+using Microsoft.AspNetCore.SignalR;
+using upLiftUnity_API.MongoModels;
+using upLiftUnity_API.Services.EmailSender;
+using upLiftUnity_API.Repositories.NotificationRepository;
+using upLiftUnity_API.Services;
+using upLiftUnity_API.RealTimeChat.Hubs;
+using upLiftUnity_API.RealTimeChat.Repositories;
+using upLiftUnity_API.RealTimeChat.Repository.MessageRepository;
+using upLiftUnity_API.RealTimeChat.Services;
 using upLiftUnity_API.Repositories;
+
+
+
+
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
@@ -30,8 +44,20 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection"))
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
 builder.Services.AddScoped<IDonationRepository, DonationRepository>();
-//builder.Services.AddScoped<IRulesRepository, RulesRepository>();
-//builder.Services.AddScoped<ICallsRepository, CallsRepository>();
+builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+builder.Services.AddScoped<IActivitiesRepository, ActivitiesRepository>();
+builder.Services.AddSingleton<MongoDbContext>();
+builder.Services.AddScoped<IEmailSender,EmailSender>();
+builder.Services.AddScoped<NotificationHub>();
+builder.Services.AddSignalR();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddTransient<INotificationRepository, NotificationRepo>();
+
+// Register the background service
+builder.Services.AddSingleton<MessageBufferService>();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -72,26 +98,31 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+       builder
+           .WithOrigins("http://localhost:8080", "http://localhost:8081", "http://localhost:8082", "http://localhost:8083", "http://localhost:8084") 
+           .AllowAnyMethod()
+           .AllowAnyHeader()
+           .AllowCredentials()); 
+});
+
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors(
-    options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
-);
-
+app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
-
-
 app.MapControllers();
-
+app.MapHub<NotificationHub>("/notificationHub");
+app.MapHub<ChatHub>("Chat");
 app.Run();

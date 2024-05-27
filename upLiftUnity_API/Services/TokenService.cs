@@ -8,7 +8,7 @@ namespace upLiftUnity_API.Services
 {
     public class TokenService
     {
-        public static string GenerateToken(int id, string role)
+        public static string GenerateToken(int id, string role,string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("OUR_SECRET_KEY_FROM_EKIPA_SHKATERRUSE"); 
@@ -17,7 +17,8 @@ namespace upLiftUnity_API.Services
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, id.ToString()),
-                    new Claim(ClaimTypes.Role, role) 
+                    new Claim(ClaimTypes.Role, role),
+                     new Claim(ClaimTypes.Email, email)
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

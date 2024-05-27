@@ -2,9 +2,25 @@
 using Microsoft.AspNetCore.Mvc;
 using upLiftUnity_API.Models;
 using upLiftUnity_API.Repositories.DonationRepository;
-using upLiftUnity_API.Services; 
+using upLiftUnity_API.Services;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization; // Add this namespace for Task
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Stripe;
+using Stripe.Checkout;
+using System.IO;
+using System;
+using Microsoft.AspNetCore.Authorization;
+using System.Linq; 
+using Stripe.Checkout;
+using Microsoft.AspNetCore.SignalR;
+using upLiftUnity_API.Repositories.NotificationRepository;
+using upLiftUnity_API.DTOs.NotificationDtos;
+using IClientNotificationHub = upLiftUnity_API.Repositories.NotificationRepository.IClientNotificationHub;
+using upLiftUnity_API.Repositories.UserRepository;
+
+
+
 
 namespace upLiftUnity_API.Controllers
 {
@@ -14,11 +30,30 @@ namespace upLiftUnity_API.Controllers
     {
         private readonly APIDbContext _context;
         private readonly IDonationRepository _donation;
+        private readonly ILogger<DonationController> _logger;
+        private readonly IConfiguration _config;
+        private readonly IHubContext<NotificationHub, IClientNotificationHub> _hubContext;
+        private readonly IUserRepository _userRepository;
+        private readonly INotificationRepository _notificationRepository;
 
-        public DonationController(APIDbContext _dbcontext,IDonationRepository _dbDonations)
+        public DonationController(
+            APIDbContext _dbcontext,
+            IDonationRepository _dbDonations,
+            ILogger<DonationController> logger, 
+            IConfiguration config,
+            IHubContext<NotificationHub,
+            IClientNotificationHub> hubContext,
+            IUserRepository userRepository,
+            INotificationRepository notificationRepository
+            )
         {
             _context = _dbcontext;
             _donation = _dbDonations;
+            _logger = logger;
+            _config = config;
+            _hubContext = hubContext;
+            _userRepository = userRepository;
+            _notificationRepository = notificationRepository;   
         }
 
         [HttpGet]
@@ -57,27 +92,204 @@ namespace upLiftUnity_API.Controllers
             return Ok(await _donation.GetDonationById(Id));
         }
 
-        [HttpPost]
-        [Route("SaveDonation")]
-
-        public IActionResult CreateDonation([FromBody] Donations donation)
+        [HttpGet]
+        [Route("GetMonthlyDonationCounts")]
+        [Authorize(Roles = "SuperAdmin")]
+        public async Task<IActionResult> GetMonthlyDonationCounts()
         {
-            if (!ModelState.IsValid) 
-            {
-                return BadRequest(ModelState);
-            }
+            var monthlyDonationCounts = await _donation.GetDonationsPerMonth();
+            return Ok(monthlyDonationCounts);
+        }
 
-            if(_context.Donations.Any( d => d.DonationID == donation.DonationID ))
+
+
+        [HttpPost]
+        [Route("CreateCheckoutSession/{packageId}")]
+        public async Task<IActionResult> CreateCheckoutSession(int packageId)
+        {
+            try
             {
-                return Conflict("Ky donacion eshte realizuar nje here!");
+               
+                var stripeApiKey = _config["Stripe:SecretKey"];
+                StripeConfiguration.ApiKey = stripeApiKey;
+
+                string successUrl = _config["Urls:SuccessUrl"];
+                string cancelUrl = _config["Urls:CancelUrl"];
+
+                string packageName;
+                int unitAmount;
+
+                switch (packageId)
+                {
+                    case 1:
+                        packageName = "Package1";
+                        unitAmount = 10000;
+                        break;
+                    case 2:
+                        packageName = "Package2";
+                        unitAmount = 20000;
+                        break;
+                    case 3:
+                        packageName = "Package3";
+                        unitAmount = 30000;
+                        break;
+                    default:
+                        return BadRequest("Invalid package ID");
+                }
+
+                var options = new SessionCreateOptions
+                {
+                    PaymentMethodTypes = new List<string> { "card" },
+                    LineItems = new List<SessionLineItemOptions>
+                    {
+                        new SessionLineItemOptions
+                        {
+                            PriceData = new SessionLineItemPriceDataOptions
+                            {
+                                Currency = "eur",
+                                ProductData = new SessionLineItemPriceDataProductDataOptions
+                                {
+                                    Name = packageName,
+                                },
+                                UnitAmount = unitAmount,
+                            },
+                            Quantity = 1,
+                        }
+                    },
+                    Mode = "payment",
+                    SuccessUrl = successUrl,
+                    CancelUrl = cancelUrl,
+                    BillingAddressCollection = "required",
+
+                };
+
+                var service = new SessionService();
+                var session = await service.CreateAsync(options);
+
+                return Ok(new { url = session.Url });
             }
-            _context.Donations.Add(donation);
-            _context.SaveChanges();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating checkout session: " + ex.Message);
+                return StatusCode(500, "Error creating checkout session");
+            }
+        }
+
+        [HttpPost]
+        [Route("failedWebhook")]
+        public IActionResult FailedWebhook()
+        {
+            _logger.LogError($"Failed {nameof(FailedWebhook)}");
+            return StatusCode(500, "Error creating webhook");
+        }
+
+        //the command in cmd to listen for stripe webhook
+        //stripe listen --forward-to http://localhost:5051/api/donations/webhook
+
+
+        [HttpPost]
+        [Route("webhook")]
+        public async Task<IActionResult> Index()
+        {   
+            try
+            {
+                var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+
+                var stripeSign = Request.Headers["Stripe-Signature"];
+                var webhookSecret = _config["Stripe:WebhookKey"];
+
+                var stripeEvent = EventUtility.ConstructEvent(
+                json,
+                stripeSign,
+                webhookSecret,
+                throwOnApiVersionMismatch: false,
+                tolerance: 800
+                );
+
+                
+                switch (stripeEvent.Type)
+                {
+                    case Events.CheckoutSessionCompleted:
+
+                        var paymentIntent = stripeEvent.Data.Object as Session;
+         
+                        try
+                        {
+                            var donation = new Donations
+                            {   
+
+                                NameSurname = paymentIntent.CustomerDetails?.Name,
+                                Email = paymentIntent.CustomerDetails?.Email,
+                                Address = paymentIntent.CustomerDetails.Address.City,
+                                Amount = int.Parse(paymentIntent.AmountSubtotal.ToString()),
+                                TransactionId = paymentIntent.Id,
+                                Date = DateTime.Now
+                            };
+
+                            if (!ModelState.IsValid)
+                            {
+                                return BadRequest(ModelState);
+                            }
+
+                            if (_context.Donations.Any(d => d.DonationID == donation.DonationID))
+                            {
+                                return Conflict("Ky donacion eshte realizuar nje here!");
+                            }
+                            _context.Donations.Add(donation);
+                            _context.SaveChanges();
+                            
+
+                         
+                            var notification = new NotificationDto
+                            {
+                                Title = "New Donation Received!",
+                                Text = $"A new donation of {donation.Amount} cents has been received.",
+                                NotificationEvent = "success",
+                                CreatedOnUtc = DateTime.UtcNow
+                            };
+
+                            //  useers with roleId = 1
+                            var users = await _userRepository.GetUsersByRoleId(2);
+                            foreach (var user in users)
+                            {
+                                notification.UserId = user.Id;
+                                await _hubContext.Clients.Group(user.Id.ToString()).SendNotificationToClient(notification);
+                            }
+
+                            await _notificationRepository.CreateNotificationAsync(new Notification()
+                            {
+                                Text = notification.Text,
+                                Title = notification.Title,
+                                CreatedOnUtc = notification.CreatedOnUtc,
+                                NotificationId = Guid.NewGuid(),
+                                IsRead = false,
+                            });
+                           
+                            return Ok("Donacioni është ruajtur me sukses!");
+                          
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error saving donation to database");
+                            return StatusCode(500, "Error saving donation to database");
+                        }
+                    case "payment_intent.created":
+                        var payment = stripeEvent.Data.Object as PaymentIntent;
+                        Console.WriteLine(payment);
+                        break;
+
+                    default:
+                        Console.WriteLine("Unhandled events:", stripeEvent.Type);
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error processing Stripe webhook");
+                return BadRequest();
+            }
 
             return Ok();
         }
-    
-
-
     }
 }

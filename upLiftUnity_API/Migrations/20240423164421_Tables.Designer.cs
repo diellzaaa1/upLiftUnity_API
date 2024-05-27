@@ -12,8 +12,8 @@ using upLiftUnity_API.Models;
 namespace upLiftUnity_API.Migrations
 {
     [DbContext(typeof(APIDbContext))]
-    [Migration("20240412125356_ApplicationUpdate")]
-    partial class ApplicationUpdate
+    [Migration("20240423164421_Tables")]
+    partial class Tables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -129,6 +129,52 @@ namespace upLiftUnity_API.Migrations
                     b.ToTable("Rules");
                 });
 
+            modelBuilder.Entity("upLiftUnity_API.Models.Schedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("FirstDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FirstSlot")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FourthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FourthSlot")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SecondDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SecondSlot")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ThirdDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ThirdSlot")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Schedule");
+                });
+
             modelBuilder.Entity("upLiftUnity_API.Models.SupVol_Applications", b =>
                 {
                     b.Property<int>("ApplicationId")
@@ -136,6 +182,10 @@ namespace upLiftUnity_API.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ApplicationId"));
+
+                    b.Property<string>("ApplicationStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ApplicationType")
                         .IsRequired()
@@ -150,10 +200,6 @@ namespace upLiftUnity_API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MotivationLetter")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -232,6 +278,17 @@ namespace upLiftUnity_API.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("upLiftUnity_API.Models.Schedule", b =>
+                {
+                    b.HasOne("upLiftUnity_API.Models.User", "UserSch")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserSch");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.User", b =>
