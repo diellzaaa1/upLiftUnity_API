@@ -15,5 +15,6 @@
         public DateTime CreatedOnUtc { get; set; }
 
         public Guid NotificationId { get; set; }
+        
     }
 }

@@ -242,10 +242,11 @@ namespace upLiftUnity_API.Controllers
                          
                             var notification = new NotificationDto
                             {
-                                Title = "New Donation Received!",
-                                Text = $"A new donation of {donation.Amount} cents has been received.",
-                                NotificationEvent = "success",
-                                CreatedOnUtc = DateTime.UtcNow
+                                Title = "Një Donacion i ri u pranua!",
+                                Text = $"Një donacion i ri me shumën {donation.Amount/100} euro është bërë.",
+                                NotificationEvent = "Sukses",
+                                CreatedOnUtc = DateTime.Now,
+                                
                             };
 
                             //  useers with roleId = 1
