@@ -54,6 +54,7 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<INotificationRepository, NotificationRepo>();
+builder.Services.AddScoped<IRulesRepository, RulesRepository>();
 
 // Register the background service
 builder.Services.AddSingleton<MessageBufferService>();
