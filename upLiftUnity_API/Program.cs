@@ -38,7 +38,6 @@ builder.Services.AddSignalR();
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
 
-
 //Dependency Injection of DBcontext Class 
 builder.Services.AddDbContext<APIDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
@@ -55,6 +54,7 @@ builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<INotificationRepository, NotificationRepo>();
+builder.Services.AddScoped<IRulesRepository, RulesRepository>();
 
 // Register the background service
 builder.Services.AddSingleton<MessageBufferService>();

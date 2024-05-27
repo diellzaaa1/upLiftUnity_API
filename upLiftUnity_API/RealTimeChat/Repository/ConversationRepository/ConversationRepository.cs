@@ -27,22 +27,22 @@ namespace upLiftUnity_API.RealTimeChat.Repositories
         public async Task<IEnumerable<Model.Conversation>> GetConversationsByEmailAsync(string email)
         {
             return await _context.Conversation
-                                 .Where(c => c.SenderEmail == email || c.ReciverEmail == email)
+                                 .Where(c => c.User1 == email || c.User2 == email)
                                  .ToListAsync();
         }
 
-        public async Task<Model.Conversation> GetOrCreateConversationAsync(string senderEmail, string receiverEmail)
+        public async Task<Model.Conversation> GetOrCreateConversationAsync(string user1, string user2)
         {
             var conversation = await _context.Conversation
-                                             .FirstOrDefaultAsync(c => (c.SenderEmail == senderEmail && c.ReciverEmail == receiverEmail) ||
-                                                                        (c.SenderEmail == receiverEmail && c.ReciverEmail == senderEmail));
+                                             .FirstOrDefaultAsync(c => (c.User1 == user1 && c.User2 == user2) ||
+                                                                        (c.User1 == user2 && c.User2 == user1));
 
             if (conversation == null)
             {
                 conversation = new Model.Conversation
                 {
-                    SenderEmail = senderEmail,
-                    ReciverEmail = receiverEmail,
+                    User1 = user1,
+                    User2 = user2,
                     CreatedAt = DateTime.Now
                 };
 
@@ -52,17 +52,16 @@ namespace upLiftUnity_API.RealTimeChat.Repositories
             return conversation;
         }
 
-        public async Task<int> GetConversationIdByEmailsAsync(string senderEmail, string receiverEmail)
+        public async Task<int> GetConversationIdByEmailsAsync(string user1, string user2)
         {
             var conversation = await _context.Conversation
                 .FirstOrDefaultAsync(c =>
-                    (c.SenderEmail == senderEmail && c.ReciverEmail == receiverEmail) ||
-                    (c.SenderEmail == receiverEmail && c.ReciverEmail == senderEmail)
+                    (c.User1 == user1 && c.User2 == user2) ||
+                    (c.User1 == user2 && c.User2 == user1)
                 );
 
             if (conversation == null)
             {
-                // Kthe -1 nëse nuk ka konversation
                 return -1;
             }
 
