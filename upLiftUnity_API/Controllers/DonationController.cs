@@ -249,7 +249,7 @@ namespace upLiftUnity_API.Controllers
                             };
 
                             //  useers with roleId = 1
-                            var users = await _userRepository.GetUsersByRoleId(2);
+                            var users = await _userRepository.GetUsersByRoleId(1);
                             foreach (var user in users)
                             {
                                 notification.UserId = user.Id;

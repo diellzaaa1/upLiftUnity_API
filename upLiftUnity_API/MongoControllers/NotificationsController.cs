@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 using upLiftUnity_API.MongoModels;
+using upLiftUnity_API.Repositories.UserRepository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace upLiftUnity_API.Controllers
 {
@@ -16,11 +18,13 @@ namespace upLiftUnity_API.Controllers
     {
  
         private readonly IMongoCollection<Notification> _notifications;
-       
+        private readonly IUserRepository _userRepository;
 
-        public NotificationsController(MongoDbContext mongoDbContext)
+
+        public NotificationsController(MongoDbContext mongoDbContext, IUserRepository userRepository)
         {
             _notifications = mongoDbContext.Database?.GetCollection<Notification>("notification");
+            _userRepository = userRepository;
         }
 
         [HttpPost]
@@ -70,29 +74,31 @@ namespace upLiftUnity_API.Controllers
             }
         }
 
-        //[HttpPut("Update/{id}")]
-        //public async Task<IActionResult> UpdateNotification(string id, [FromBody] NotificationDto notificationDto)
-        //{
-        //    try
-        //    {
-        //        var existingNotification = await _notificationService.GetNotificationByIdAsync(id);
 
-        //        if (existingNotification == null)
-        //        {
-        //            return NotFound();
-        //        }
-        //       existingNotification.IsRead = notificationDto.IsRead;
+        [HttpGet("getNotifications")]
+  
+        public async Task<IActionResult> GetAllNotifications()
+        {
+            try
+            {
+                var notifications = await _notifications.Find(_ => true)
+                                                .SortByDescending(n => n.CreatedOnUtc)
+                                                .ToListAsync();
 
-        //        await _notificationService.UpdateNotificationAsync(id, existingNotification);
+                var notificationDtos = notifications.Select(n => new NotificationDto
+                {
+                    Title = n.Title,
+                    Text = n.Text,
+                    CreatedOnUtc = n.CreatedOnUtc,
+                }).ToList();
 
-        //        return NoContent(); 
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"An error occurred: {ex.Message}");
-        //    }
-        //}
-
+                return Ok(notificationDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
     }
 
 }
