@@ -1,4 +1,5 @@
-﻿using upLiftUnity_API.Models;
+﻿using upLiftUnity_API.DTOs.ActivitiesDto;
+using upLiftUnity_API.Models;
 
 namespace upLiftUnity_API.Repositories.ActivitiesRepository
 {
@@ -7,5 +8,10 @@ namespace upLiftUnity_API.Repositories.ActivitiesRepository
         Task<IEnumerable<UserActivity>> GetUserActivities();
 
         Task<IEnumerable<UserActivity>> GetUserActivityById(int id);
+        Task<IEnumerable<UserActivityMonthlyCountDto>> GetUserLoginCountsPerMonth();
+        Task<IEnumerable<UserLoginCountDto>> GetUserLoginCounts();
+
+
+
     }
 }

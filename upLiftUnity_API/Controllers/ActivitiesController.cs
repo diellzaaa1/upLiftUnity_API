@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using upLiftUnity_API.Models;
 using upLiftUnity_API.Repositories.ActivitiesRepository;
 
 namespace upLiftUnity_API.Controllers
@@ -23,11 +25,30 @@ namespace upLiftUnity_API.Controllers
         {
             return Ok(await activitiesRepository.GetUserActivities());
         }
+
+
         [HttpGet]
         [Route("GetActivitiesById/{id}")]
         public async Task<IActionResult> GetScheduleById(int id)
         {
             return Ok(await activitiesRepository.GetUserActivityById(id));
+        }
+
+
+        [HttpGet]
+        [Route("GetMonthlyLoginCounts")]
+        public async Task<IActionResult> GetUserLoginCountsPerMonth()
+        {
+            var monthlyLoginCounts = await activitiesRepository.GetUserLoginCountsPerMonth();
+            return Ok(monthlyLoginCounts);
+        }
+
+        [HttpGet]
+        [Route("GetUserLoginCounts")]
+        public async Task<IActionResult> GetUserLoginCounts()
+        {
+            var userLoginCounts = await activitiesRepository.GetUserLoginCounts();
+            return Ok(userLoginCounts);
         }
     }
 }
