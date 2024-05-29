@@ -25,9 +25,12 @@ public class ScheduleRepository : IScheduleRepository
     public async Task<Schedule> GetScheduleByUserId(int userId)
     {
         return await _appDBContext.Schedule
-               .Include(schedule => schedule.UserSch) 
-               .FirstOrDefaultAsync(schedule => schedule.UserId == userId);
+            .Include(schedule => schedule.UserSch)
+            .Where(schedule => schedule.UserId == userId)
+            .OrderByDescending(schedule => schedule.Id) // Sigurohuni që keni një fushë për renditje të duhur
+            .FirstOrDefaultAsync();
     }
+
 
 
     public async Task<Schedule> UpdateSchedule(Schedule sch)

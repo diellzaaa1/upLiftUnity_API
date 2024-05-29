@@ -46,7 +46,7 @@ namespace upLiftUnity_API.Controllers
         public async Task<IActionResult> AddSchedule(Schedule sch)
         {
            
-            var currentMonth = DateTime.Now.Month;
+            var currentMonth = DateTime.Now.Month+1;
             var currentYear = DateTime.Now.Year;
 
           
