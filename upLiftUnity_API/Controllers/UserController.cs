@@ -114,7 +114,7 @@ namespace upLiftUnity_API.Controllers
         }
         [HttpGet]
         [Route("GetUsers")]
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize]
         public async Task<IActionResult> Get()
         {
             var users = await _user.GetUsers();
