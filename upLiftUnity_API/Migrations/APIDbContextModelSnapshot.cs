@@ -22,31 +22,6 @@ namespace upLiftUnity_API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("upLiftUnity_API.Models.Conversation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("IPAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LoginTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserActivities");
-                });
-
             modelBuilder.Entity("upLiftUnity_API.Models.Donations", b =>
                 {
                     b.Property<int>("DonationID")
@@ -80,6 +55,26 @@ namespace upLiftUnity_API.Migrations
                     b.HasKey("DonationID");
 
                     b.ToTable("Donations");
+                });
+
+            modelBuilder.Entity("upLiftUnity_API.Models.Feedback", b =>
+                {
+                    b.Property<int>("FeedbackId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FeedbackId"));
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Suggestion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("FeedbackId");
+
+                    b.ToTable("Feedback");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.Role", b =>
@@ -238,6 +233,31 @@ namespace upLiftUnity_API.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("upLiftUnity_API.Models.UserActivity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IPAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LoginTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserActivities");
+                });
+
             modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Conversation", b =>
                 {
                     b.Property<int>("ConversationId")
@@ -249,11 +269,11 @@ namespace upLiftUnity_API.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ReciverEmail")
+                    b.Property<string>("User1")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SenderEmail")
+                    b.Property<string>("User2")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -280,22 +300,19 @@ namespace upLiftUnity_API.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Reciever")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("MessageId");
 
                     b.HasIndex("ConversationId");
 
                     b.ToTable("Message");
-                });
-
-            modelBuilder.Entity("upLiftUnity_API.Models.Conversation", b =>
-                {
-                    b.HasOne("upLiftUnity_API.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.Rules", b =>
@@ -329,6 +346,17 @@ namespace upLiftUnity_API.Migrations
                         .IsRequired();
 
                     b.Navigation("UserRole");
+                });
+
+            modelBuilder.Entity("upLiftUnity_API.Models.UserActivity", b =>
+                {
+                    b.HasOne("upLiftUnity_API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.RealTimeChat.Model.Message", b =>
