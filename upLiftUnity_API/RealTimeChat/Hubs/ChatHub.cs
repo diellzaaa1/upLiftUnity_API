@@ -66,8 +66,8 @@ namespace upLiftUnity_API.RealTimeChat.Hubs
                 {
                     Content = message,
                     ConversationId = conversation.ConversationId,
-                    Sender = sender,      // Kjo rresht shton Sender
-                    Reciever = recipient  // Kjo rresht shton Reciever
+                    Sender = sender,      
+                    Reciever = recipient  
                 };
 
                 _messageBufferService.AddMessageToBuffer(bufferedMessage);
