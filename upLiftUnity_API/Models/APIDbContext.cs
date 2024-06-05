@@ -20,6 +20,8 @@ namespace upLiftUnity_API.Models
         public DbSet<Schedule> Schedule { get; set; }
         public DbSet<UserActivity> UserActivities { get; set; }
 
+        public DbSet<Feedback> Feedback { get; set; }
+
 
         public DbSet<RealTimeChat.Model.Conversation> Conversation { get; set; }
 
