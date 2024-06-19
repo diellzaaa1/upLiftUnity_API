@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using upLiftUnity_API.Models;
 
@@ -11,9 +12,11 @@ using upLiftUnity_API.Models;
 namespace upLiftUnity_API.Migrations
 {
     [DbContext(typeof(APIDbContext))]
-    partial class APIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240619114158_AddPlanetAndSatelliteTables")]
+    partial class AddPlanetAndSatelliteTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,30 +80,6 @@ namespace upLiftUnity_API.Migrations
                     b.ToTable("Feedback");
                 });
 
-            modelBuilder.Entity("upLiftUnity_API.Models.Planet", b =>
-                {
-                    b.Property<int>("PlanetId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlanetId"));
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PlanetId");
-
-                    b.ToTable("Planet");
-                });
-
             modelBuilder.Entity("upLiftUnity_API.Models.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -142,31 +121,6 @@ namespace upLiftUnity_API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Rules");
-                });
-
-            modelBuilder.Entity("upLiftUnity_API.Models.Satellite", b =>
-                {
-                    b.Property<int>("SatelliteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SatelliteId"));
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PlanetId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SatelliteId");
-
-                    b.HasIndex("PlanetId");
-
-                    b.ToTable("Satellite");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.Schedule", b =>
@@ -373,17 +327,6 @@ namespace upLiftUnity_API.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("upLiftUnity_API.Models.Satellite", b =>
-                {
-                    b.HasOne("upLiftUnity_API.Models.Planet", "Planet")
-                        .WithMany()
-                        .HasForeignKey("PlanetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Planet");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.Schedule", b =>

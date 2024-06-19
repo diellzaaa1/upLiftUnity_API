@@ -10,7 +10,8 @@ namespace upLiftUnity_API.Models
         {
 
         }
-
+        public DbSet<Planet> Planet { get; set; }
+        public DbSet<Satellite> Satellite { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<SupVol_Applications> SupVol_Applications { get; set; }
