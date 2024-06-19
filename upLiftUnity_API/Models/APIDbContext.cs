@@ -15,12 +15,13 @@ namespace upLiftUnity_API.Models
         public DbSet<Role> Roles { get; set; }
         public DbSet<SupVol_Applications> SupVol_Applications { get; set; }
         public DbSet<Donations> Donations { get; set; }
-       
         public DbSet<Rules> Rules { get; set; }
         public DbSet<Schedule> Schedule { get; set; }
         public DbSet<UserActivity> UserActivities { get; set; }
-
         public DbSet<Feedback> Feedback { get; set; }
+
+        public DbSet<Planet> Planets { get; set; }
+        public DbSet<Satelite> Satelites { get; set; }
 
 
         public DbSet<RealTimeChat.Model.Conversation> Conversation { get; set; }

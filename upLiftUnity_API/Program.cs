@@ -21,6 +21,7 @@ using upLiftUnity_API.RealTimeChat.Repositories;
 using upLiftUnity_API.RealTimeChat.Repository.MessageRepository;
 using upLiftUnity_API.RealTimeChat.Services;
 using upLiftUnity_API.Repositories;
+using upLiftUnity_API.Repositories.PlanetsRepository;
 
 
 
@@ -56,6 +57,8 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<INotificationRepository, NotificationRepo>();
 builder.Services.AddScoped<IRulesRepository, RulesRepository>();
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+
+builder.Services.AddScoped<IPlanetRepository, PlanetRepository>();
 
 // Register the background service
 builder.Services.AddSingleton<MessageBufferService>();
