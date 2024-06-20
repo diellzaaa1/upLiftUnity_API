@@ -27,6 +27,16 @@ namespace upLiftUnity_API.Controllers
         {
             return Ok(await _planetsRepository.GetPlanetSatelites(name));
         }
+        [HttpGet("/planets")]
+        public async Task<IActionResult> GetPlanets()
+        {
+            return Ok(await _planetsRepository.GetPlanets());
+        }
+        [HttpGet("/satelites")]
+        public async Task<IActionResult> GetSatelites()
+        {
+            return Ok(await _planetsRepository.GetSatelites());
+        }
 
         [HttpPost("satelites")]
         public async Task<IActionResult> AddPlanetSatelite([FromBody] SateliteDto sateliteDto)

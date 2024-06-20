@@ -55,6 +55,15 @@ namespace upLiftUnity_API.Repositories.PlanetsRepository
             }
         }
 
+        public async Task<List<Planet>> GetPlanets()
+        {
+            var planets = await _dbContext.Planets
+                                          .Where(x => !x.IsDeleted)
+                                          .ToListAsync();
+
+            return planets;
+        }
+
         public async Task<List<SateliteDto>> GetPlanetSatelites(string planetName)
         {
             var planet = await _dbContext.Planets
@@ -78,6 +87,15 @@ namespace upLiftUnity_API.Repositories.PlanetsRepository
             });
 
             return satelitesDto.ToList();
+        }
+
+        public async Task<List<Satelite>> GetSatelites()
+        {
+            var satelites = await _dbContext.Satelites
+                                           .Where(x => !x.IsDeleted)
+                                           .ToListAsync();
+
+            return satelites;
         }
 
         public async Task UpdatePlanet(string planetName, string newType)
