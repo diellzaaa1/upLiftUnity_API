@@ -85,7 +85,6 @@ namespace upLiftUnity_API.Repositories.PlanetsRepository
                 IsDeleted = satelite.IsDeleted,
                 PlanetId = satelite.PlanetId
             });
-
             return satelitesDto.ToList();
         }
 

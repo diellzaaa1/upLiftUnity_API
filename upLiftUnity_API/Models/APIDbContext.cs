@@ -20,8 +20,16 @@ namespace upLiftUnity_API.Models
         public DbSet<UserActivity> UserActivities { get; set; }
         public DbSet<Feedback> Feedback { get; set; }
 
+
+
         public DbSet<Planet> Planets { get; set; }
         public DbSet<Satelite> Satelites { get; set; }
+
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Contract> Contracts { get; set; }
+
+        public DbSet<Buildingg> Buildinggs { get; set; }
+        public DbSet<Renovationn> Renovationns { get; set; }
 
 
         public DbSet<RealTimeChat.Model.Conversation> Conversation { get; set; }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using upLiftUnity_API.Models;
 
@@ -11,9 +12,11 @@ using upLiftUnity_API.Models;
 namespace upLiftUnity_API.Migrations
 {
     [DbContext(typeof(APIDbContext))]
-    partial class APIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240702103439_employee-contract")]
+    partial class employeecontract
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,27 +24,6 @@ namespace upLiftUnity_API.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("upLiftUnity_API.Models.Buildingg", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Buildinggs");
-                });
 
             modelBuilder.Entity("upLiftUnity_API.Models.Contract", b =>
                 {
@@ -165,34 +147,6 @@ namespace upLiftUnity_API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Planets");
-                });
-
-            modelBuilder.Entity("upLiftUnity_API.Models.Renovationn", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BuildingId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BuildinggId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Cost")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BuildinggId");
-
-                    b.ToTable("Renovationns");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.Role", b =>
@@ -467,17 +421,6 @@ namespace upLiftUnity_API.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("upLiftUnity_API.Models.Renovationn", b =>
-                {
-                    b.HasOne("upLiftUnity_API.Models.Buildingg", "Buildingg")
-                        .WithMany()
-                        .HasForeignKey("BuildinggId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Buildingg");
                 });
 
             modelBuilder.Entity("upLiftUnity_API.Models.Rules", b =>

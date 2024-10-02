@@ -22,6 +22,9 @@ using upLiftUnity_API.RealTimeChat.Repository.MessageRepository;
 using upLiftUnity_API.RealTimeChat.Services;
 using upLiftUnity_API.Repositories;
 using upLiftUnity_API.Repositories.PlanetsRepository;
+using upLiftUnity_API.Repositories.EmployeeRepository;
+using upLiftUnity_API.Repositories.BuildinggRepository;
+
 
 
 
@@ -49,6 +52,7 @@ builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddScoped<IActivitiesRepository, ActivitiesRepository>();
 builder.Services.AddSingleton<MongoDbContext>();
 builder.Services.AddScoped<IEmailSender,EmailSender>();
+
 builder.Services.AddScoped<NotificationHub>();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<NotificationService>();
@@ -59,6 +63,12 @@ builder.Services.AddScoped<IRulesRepository, RulesRepository>();
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 
 builder.Services.AddScoped<IPlanetRepository, PlanetRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IBuildinggRepository, BuildinggRepository>();
+
+
+
+
 
 // Register the background service
 builder.Services.AddSingleton<MessageBufferService>();
