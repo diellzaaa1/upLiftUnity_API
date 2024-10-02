@@ -22,6 +22,8 @@ using upLiftUnity_API.RealTimeChat.Repository.MessageRepository;
 using upLiftUnity_API.RealTimeChat.Services;
 using upLiftUnity_API.Repositories;
 using upLiftUnity_API.Repositories.GroupsRepository;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using upLiftUnity_API.Repositories.MembersRepository;
 
 
 
@@ -60,6 +62,7 @@ builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 
 // groups & members
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 
 // Register the background service
 builder.Services.AddSingleton<MessageBufferService>();

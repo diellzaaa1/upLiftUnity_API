@@ -35,5 +35,13 @@ namespace upLiftUnity_API.Controllers
             await _groupRepository.DeleteGroup(id);
             return Ok("Group deleted!");
         }
+
+        [HttpPut("id")]
+
+        public async Task<IActionResult> UpdateGroup(int id,[FromBody] UpdateGroupDto dto)
+        {
+            await _groupRepository.UpdateGroup(id,dto.GroupName,dto.Description);
+            return Ok("Updated successfully!");
+        }
     }
 }
