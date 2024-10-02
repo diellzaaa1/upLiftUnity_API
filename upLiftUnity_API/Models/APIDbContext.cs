@@ -27,6 +27,10 @@ namespace upLiftUnity_API.Models
 
         public DbSet<Message> Message { get; set; }
 
+        public DbSet<Group> Groups { get; set; }
+
+        public DbSet<Member> Members { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureUser(modelBuilder);
