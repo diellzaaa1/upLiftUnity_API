@@ -19,8 +19,18 @@ namespace upLiftUnity_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllMembers()
         {
-            var result = await _memberRepository.GetAllMembers();
-            return Ok(result);
+            var members = await _memberRepository.GetAllMembers();
+            var membersResult = members.Select((member) =>
+            {
+                return new
+                {
+                    Name = member.Name,
+                    Role = member.Role,
+                    GroupId = member.GroupId,
+                    GroupName = member.Group?.GroupName
+                };
+            });
+            return Ok(membersResult);
         }
 
         [HttpPost]

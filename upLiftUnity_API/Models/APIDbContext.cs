@@ -30,6 +30,10 @@ namespace upLiftUnity_API.Models
         public DbSet<Group> Groups { get; set; }
 
         public DbSet<Member> Members { get; set; }
+        
+
+        public DbSet<Botuesi> Botuesit { get; set; }
+        public DbSet<Revista> Revistat { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

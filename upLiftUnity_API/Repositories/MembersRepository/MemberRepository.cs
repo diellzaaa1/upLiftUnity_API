@@ -35,7 +35,9 @@ namespace upLiftUnity_API.Repositories.MembersRepository
 
         public async Task<List<Member>> GetAllMembers()
         {
-            return await _dbContext.Members.ToListAsync();
+            return await _dbContext.Members
+                .Include(x=>x.Group)
+                .ToListAsync();
         }
     }
 }

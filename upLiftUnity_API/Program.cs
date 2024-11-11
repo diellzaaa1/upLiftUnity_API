@@ -24,6 +24,8 @@ using upLiftUnity_API.Repositories;
 using upLiftUnity_API.Repositories.GroupsRepository;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using upLiftUnity_API.Repositories.MembersRepository;
+using upLiftUnity_API.Repositories.BotuesiRepository;
+using upLiftUnity_API.Repositories.RevistaRepository;
 
 
 
@@ -59,6 +61,8 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddTransient<INotificationRepository, NotificationRepo>();
 builder.Services.AddScoped<IRulesRepository, RulesRepository>();
 builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+builder.Services.AddScoped<IBotuesiRepository,BotuesiRepository>();
+builder.Services.AddScoped<IRevistaRepository,RevistaRepository>();
 
 // groups & members
 builder.Services.AddScoped<IGroupRepository, GroupRepository>();

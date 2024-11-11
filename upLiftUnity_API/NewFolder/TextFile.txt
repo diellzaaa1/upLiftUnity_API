@@ -1,0 +1,26 @@
+﻿Add-Migration emriMigrimit
+
+Remove-Migration  //fshije migrimin e fundit nese ke bo naj gabim kqyre metoden Up dhe Down te Migrimit qka ka
+
+Update-database //hapi i fundit
+
+1-Krijimi i modeleve
+
+2-shtimi i modeleve te ApiDbcontext
+
+3-Repository (Interface masnej implementoje ne Repository Class)
+
+4-Shtimi ne service te Program.cs
+
+5-Controlleri
+
+test ne swagger
+
+FRONTEND
+
+1-Krijo ni page te ri
+2-Ndrysho home page me qat link te routes
+3-vazhdo paq fat
+
+
+
